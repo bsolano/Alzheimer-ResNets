@@ -131,6 +131,7 @@ class _Transition(nn.Sequential):
 class DenseNet(nn.Module):
     """Densenet-BC model class
     Args:
+        channels (int) - how many input channels
         growth_rate (int) - how many filters to add each layer (k in paper)
         block_config (list of 4 ints) - how many layers in each pooling block
         num_init_features (int) - the number of filters to learn in the first convolution layer
@@ -143,6 +144,7 @@ class DenseNet(nn.Module):
     def __init__(self,
                  sample_size,
                  sample_duration,
+                 channels=3,
                  growth_rate=32,
                  block_config=(6, 12, 24, 16),
                  num_init_features=64,
@@ -160,7 +162,7 @@ class DenseNet(nn.Module):
             OrderedDict([
                 ('conv0',
                  nn.Conv3d(
-                     3,
+                     channels,
                      num_init_features,
                      kernel_size=7,
                      stride=(1, 2, 2),
