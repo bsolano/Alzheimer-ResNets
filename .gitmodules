@@ -1,0 +1,3 @@
+[submodule "3D-ResNets-PyTorch"]
+	path = 3D-ResNets-PyTorch
+	url = https://github.com/kenshohara/3D-ResNets-PyTorch
