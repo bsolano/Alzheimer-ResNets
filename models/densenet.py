@@ -72,18 +72,18 @@ class _DenseLayer(nn.Sequential):
 
     def __init__(self, num_input_features, growth_rate, bn_size, drop_rate):
         super(_DenseLayer, self).__init__()
-        self.add_module('norm.1', nn.BatchNorm3d(num_input_features))
-        self.add_module('relu.1', nn.ReLU(inplace=True))
-        self.add_module('conv.1',
+        self.add_module('norm1', nn.BatchNorm3d(num_input_features))
+        self.add_module('relu1', nn.ReLU(inplace=True))
+        self.add_module('conv1',
                         nn.Conv3d(
                             num_input_features,
                             bn_size * growth_rate,
                             kernel_size=1,
                             stride=1,
                             bias=False))
-        self.add_module('norm.2', nn.BatchNorm3d(bn_size * growth_rate))
-        self.add_module('relu.2', nn.ReLU(inplace=True))
-        self.add_module('conv.2',
+        self.add_module('norm2', nn.BatchNorm3d(bn_size * growth_rate))
+        self.add_module('relu2', nn.ReLU(inplace=True))
+        self.add_module('conv2',
                         nn.Conv3d(
                             bn_size * growth_rate,
                             growth_rate,
@@ -194,7 +194,7 @@ class DenseNet(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
-                m.weight = nn.init.kaiming_normal(m.weight, mode='fan_out')
+                m.weight = nn.init.kaiming_normal_(m.weight, mode='fan_out')
             elif isinstance(m, nn.BatchNorm3d) or isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
