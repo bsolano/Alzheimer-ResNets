@@ -11,7 +11,7 @@ class ToTensor(object):
         if spacing is not None:
             assert isinstance(spacing, (list, tuple))
         if num_slices is not None:
-            assert isinstance(num_slices, (list, tuple))
+            assert isinstance(num_slices, (int))
         self.spacing = spacing
         self.num_slices = num_slices
         self.aspect = aspect
@@ -26,6 +26,7 @@ class ToTensor(object):
         # Obtenemos una lista de matrices numpy con los cortes, es decir, un cubo.
         try:
             image, ijk_to_xyz = dicom_numpy.combine_slices(sample)
+            image = image.astype(np.float32)
         except dicom_numpy.DicomImportException as e:
             # invalid DICOM data
             raise e
@@ -50,51 +51,56 @@ class ToTensor(object):
 
         # Siempre convertimos cada corte a 256x256, si el corte no es cuadrado
         # lo rellenamos.
-        for slice in range(image.shape[0]):
-            (height, width) = image[slice].shape
-            if height > width:
-                w = (height-width)//2
-                for i in range(w):
-                    image[slice] = np.insert(image[slice], width, [0], axis=1)
-                for i in range(w):
-                    image[slice] = np.insert(image[slice], 0, [0], axis=1)
-            if height < width:
-                h = (width-height)//2
-                for i in range(h):
-                    image[slice] = np.insert(image[slice], width, [0], axis=0)
-                for i in range(w):
-                    image[slice] = np.insert(image[slice], 0, [0], axis=0)
-            image[slice] = skimage.transform.resize(image[slice], [256, 256])
+        (deep, height, width) = image.shape
+        if height > width:
+            w = (height-width)//2
+            for i in range(w):
+                image = np.insert(image, width, [0], axis=2)
+            for i in range(w):
+                image = np.insert(image, 0, [0], axis=2)
+        if height < width:
+            h = (width-height)//2
+            for i in range(h):
+                image = np.insert(image, width, [0], axis=1)
+            for i in range(w):
+                image = np.insert(image, 0, [0], axis=1)
+        real_resize_factor = np.array([deep, 256, 256]) / image.shape
+        # Reconstrucción de la imagen al nuevo tamaño de voxel
+        if image.shape[1] != 256 and image.shape[2] != 256:
+            image = scipy.ndimage.interpolation.zoom(image, real_resize_factor)
 
-        # Establecemos el número de planos:
+        # Establecemos el número de cortes:
         if self.num_slices is not None:
-            if spacing and new_spacing:
-                spacing = new_spacing
-            else:
-                # Tamaño actual de los voxel
-                spacing = map(float, ([sample[0].SliceThickness] + sample[0].PixelSpacing))
-                spacing = np.array(list(spacing))
+            #if 'spacing' in locals() and 'new_spacing' in locals():
+            #    spacing = new_spacing
+            #else:
+            #    # Tamaño actual de los voxel
+            #    spacing = map(float, ([sample[0].SliceThickness] + sample[0].PixelSpacing))
+            #    spacing = np.array(list(spacing))
                 
-            new_spacing = spacing
-            new_spacing[0] = self.num_slices/image.shape[0]
+            #new_spacing = spacing
+            #new_spacing[0] = self.num_slices/image.shape[0]
 
             # Cálculo de las nuevas proporciones
-            resize_factor = spacing / new_spacing
-            new_real_shape = image.shape * resize_factor
-            new_shape = np.round(new_real_shape)
-            real_resize_factor = new_shape / image.shape
-            new_spacing = spacing / real_resize_factor
+            #resize_factor = spacing / new_spacing
+            #new_real_shape = image.shape * resize_factor
+            #new_shape = np.round(new_real_shape)
+            #real_resize_factor = new_shape / image.shape
+            #new_spacing = spacing / real_resize_factor
             
+            (deep, height, width) = image.shape
+            real_resize_factor = np.array([self.num_slices, height, width]) / image.shape
+
             # Reconstrucción de la imagen al nuevo tamaño de voxel
             image = scipy.ndimage.interpolation.zoom(image, real_resize_factor)
 
         # Un canal:
         if self.aspect == 'sagittal':
-            channel = [image[self.cut[0]:self.cut[1]:]]
+            pass
         elif self.aspect == 'axial':
             image = np.rot90(image)
             image = np.rot90(image, k=-1, axes=(1,2))
-            channel = [image[self.cut[0]:self.cut[1]:]]
+            channel = [image[self.cut[0], self.cut[1], self.cut[2]]]
         elif self.aspect == 'coronal':
             pass
 

@@ -1,2 +1,4 @@
 /.vscode
 /ADNI
+/__pycache__
+/models/__pycache__

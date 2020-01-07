@@ -10,12 +10,10 @@ import re
 import csv
 # Para el tensor
 import torch
-# Para manejar conjuntos de datos y heredar de la clase
-from torch.utils.data import Dataset
 
 CLASS_NAMES = [ 'CN', 'SMC', 'EMCI', 'MCI', 'LMCI', 'AD']
 
-class ADNI_Dataset(Dataset):
+class ADNI_Dataset(torch.utils.data.Dataset):
     def __init__(self, data_dir='ADNI', transform=None):
         ''' '''
 
@@ -64,6 +62,9 @@ class ADNI_Dataset(Dataset):
             image and its labels
         """
         
+        if torch.is_tensor(index):
+            index = index.tolist()
+        
         key = self.image_names[index]
 
         #
@@ -75,6 +76,15 @@ class ADNI_Dataset(Dataset):
             image.append(dcm.dcmread(file.as_posix()))
         if self.transform is not None:
             image = self.transform(image)
+        else:
+            # Obtenemos una lista de matrices numpy con los cortes, es decir, un cubo.
+            try:
+                image, ijk_to_xyz = dicom_numpy.combine_slices(image)
+                image = image.astype(np.float32)
+            except dicom_numpy.DicomImportException as e:
+                # invalid DICOM data
+                raise e
+
         
         #
         # Es necesario armar un arreglo binario (0,1) para la etiqueta
@@ -87,7 +97,7 @@ class ADNI_Dataset(Dataset):
             else:
                 label.append(0)
 
-        return image, torch.Tensor(label)
+        return image, torch.LongTensor(label)
 
     def __len__(self):
         return len(self.image_names)
