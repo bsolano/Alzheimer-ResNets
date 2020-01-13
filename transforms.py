@@ -29,9 +29,9 @@ class ToTensor(object):
         try:
             image, ijk_to_xyz = dicom_numpy.combine_slices(sample)
             image = image.astype(np.float32)
-        except dicom_numpy.DicomImportException as e:
+        except Exception as e:
             # Invalid DICOM data
-            # We go manually
+            # We go without help
             try:
                 slices = sorted(sample, key=lambda s: s.SliceLocation)
                 image = [s.pixel_array for s in slices]
