@@ -131,8 +131,8 @@ def test():
     print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
 
     # ROC curve
-    plot_ROC_curve(test, predicted)
-    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(test, predicted)))
+    plot_ROC_curve(test, torch.sigmoid(torch.Tensor(predicted)).numpy())
+    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(test, torch.sigmoid(torch.Tensor(predicted)).numpy())))
 
 
 def plot_confusion_matrix(cm, classes,
