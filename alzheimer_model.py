@@ -64,7 +64,7 @@ def test():
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=1)
 
     # Inicializa y carga el modelo
-    model = densenet121(channels=1, num_classes=len(CLASS_NAMES)).cuda()
+    model = densenet121(channels=1, num_classes=len(CLASS_NAMES), drop_rate=0.7).cuda()
     model = torch.nn.DataParallel(model).to(device)
     model.train()
 
