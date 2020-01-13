@@ -30,8 +30,15 @@ class ToTensor(object):
             image, ijk_to_xyz = dicom_numpy.combine_slices(sample)
             image = image.astype(np.float32)
         except dicom_numpy.DicomImportException as e:
-            # invalid DICOM data
-            raise e
+            # Invalid DICOM data
+            # We go manually
+            try:
+                slices = sorted(sample, key=lambda s: s.SliceLocation)
+                image = [s.pixel_array for s in slices]
+                image = image.astype(np.float32)
+                del slices
+            except Exception as e:
+                raise e
 
         if self.spacing is not None:
             # Nuevo tamaño de los voxel
