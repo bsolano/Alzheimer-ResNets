@@ -21,12 +21,30 @@ import torch.backends.cudnn as cudnn
 import torchvision.transforms as transforms
 from torch.utils.data.sampler import SubsetRandomSampler
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+from torchsummary import summary
+
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import roc_curve
+from sklearn.metrics import roc_auc_score
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 def test():
+    # Sets device to GPU if available, else CPU
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('Using device:', device)
+    print()
+
+    # Additional about GPU
+    if device.type == 'cuda':
+        print(torch.cuda.get_device_name(0))
+        print('Memory Usage:')
+        print('Allocated:', round(torch.cuda.memory_allocated(0)/1024**3,1), 'GB')
+        print('Cached:   ', round(torch.cuda.memory_cached(0)/1024**3,1), 'GB')
 
     # Optimiza la corrida
     cudnn.benchmark = True
@@ -47,7 +65,11 @@ def test():
 
     # Inicializa y carga el modelo
     model = densenet121(channels=1, num_classes=len(CLASS_NAMES)).cuda()
-    model = torch.nn.DataParallel(model).cuda()
+    model = torch.nn.DataParallel(model).to(device)
+    model.train()
+
+    # Imprime el modelo:
+    #summary(model, adni_dataset[0][0].shape)
 
     # Función de pérdida:
     # Es la función usada para evaluar una solución candidata, es decir, la topología diseñada con sus pesos.
@@ -55,7 +77,7 @@ def test():
 
     # Optimizador:
     # Estas son optimizaciones al algoritmo de descenso por gradiente para evitar mínimos locales en la búsqueda.
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01) # SGD: Descenso por gradiente estocástico
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.5) # SGD: Descenso por gradiente estocástico
 
     # Ciclo de entrenamiento:
     for epoch in range(EPOCHS):
@@ -63,7 +85,7 @@ def test():
         for i, data in enumerate(train_loader):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
-            labels = labels.cuda()
+            labels = labels.to(device)
 
             # Para no acumular gradientes
             # zero the parameter gradients
@@ -81,13 +103,14 @@ def test():
                 print('[%d, %5d] pérdida: %.3f' % (epoch + 1, i + 1, running_loss / 200))
                 running_loss = 0.0
 
+    model.eval()
     test = []
     predicted = []
     with torch.no_grad():
         for data in test_loader:
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
-            labels = labels.cuda()
+            labels = labels.to(device)
             _, label = torch.max(labels, 1)
             test.append(label)
 
@@ -97,6 +120,8 @@ def test():
             predicted.append(predicted_value)
 
     # Imprime la matriz de confusión
+    test = [x.item() for x in test]
+    predicted = [x.item() for x in predicted]
     cnf_matrix = confusion_matrix(test, predicted)
     plot_confusion_matrix(cnf_matrix, classes=CLASS_NAMES)
 
@@ -104,6 +129,10 @@ def test():
     print('Accuracy: ', accuracy_score(test, predicted))
     print('Specificity (precision)', precision_score(test, predicted, average='macro'))
     print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
+
+    # ROC curve
+    plot_ROC_curve(test, predicted)
+    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(test, predicted)))
 
 
 def plot_confusion_matrix(cm, classes,
@@ -154,6 +183,15 @@ def plot_confusion_matrix(cm, classes,
                     color="white" if cm[i, j] > thresh else "black")
     fig.tight_layout()
     plt.show()
+
+
+def plot_ROC_curve(true, predicted, color = "red", label = None):
+    fp_r, tp_r, treshold = roc_curve(true, predicted)
+    plt.plot(fp_r, tp_r, lw = 1, color = color, label = label)
+    plt.plot([0, 1], [0, 1], lw = 1, color = "black")
+    plt.xlabel("Rate of false positives")
+    plt.ylabel("Rate of false negatives")
+    plt.title("ROC curve")
 
 
 # Si corre como programa principal y no como módulo:
