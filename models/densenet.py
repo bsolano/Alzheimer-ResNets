@@ -187,7 +187,11 @@ class DenseNet(nn.Module):
                 num_features = num_features // 2
 
         # Final batch norm
-        self.features.add_module('norm5', nn.BatchNorm2d(num_features))
+        self.features.add_module('norm5', nn.BatchNorm3d(num_features))
+
+        # Linear layer
+        self.classifier = nn.Linear(num_features, num_classes)
+        self.final_num_features = num_features
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -196,12 +200,10 @@ class DenseNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-        # Linear layer
-        self.classifier = nn.Linear(num_features, num_classes)
-
     def forward(self, x):
         features = self.features(x)
         out = F.relu(features, inplace=True)
-        out = F.avg_pool3d(out, (1,1,1))
+        out = F.adaptive_avg_pool3d(out, (1,1,1))
+        out = out.view(-1, self.final_num_features)
         out = self.classifier(out)
         return out
