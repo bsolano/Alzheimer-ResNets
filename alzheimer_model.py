@@ -60,8 +60,10 @@ def test():
     test_size = len(adni_dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=1)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=1)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
+
+    print('%d MRI images in loader'.format(len(train_loader)))
 
     # Inicializa y carga el modelo
     model = densenet121(channels=1, num_classes=len(CLASS_NAMES), drop_rate=0.7).cuda()
