@@ -39,10 +39,8 @@ class ToTensor(object):
                 del slices
             except Exception as e:
                 # Cruzamos los dedos
-                image = [s.pixel_array for s in slices]
+                image = [s.pixel_array for s in sample]
                 image = image.astype(np.float32)
-                del slices
-                
 
         if self.spacing is not None:
             # Nuevo tamaño de los voxel

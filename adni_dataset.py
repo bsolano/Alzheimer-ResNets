@@ -81,10 +81,18 @@ class ADNI_Dataset(torch.utils.data.Dataset):
             try:
                 image, ijk_to_xyz = dicom_numpy.combine_slices(image)
                 image = image.astype(np.float32)
-            except dicom_numpy.DicomImportException as e:
-                # invalid DICOM data
-                raise e
-
+            except Exception as e:
+                # Invalid DICOM data
+                # We go without help
+                try:
+                    slices = sorted(image, key=lambda i: i.SliceLocation)
+                    image = [s.pixel_array for s in slices]
+                    image = image.astype(np.float32)
+                    del slices
+                except Exception as e:
+                    # Cruzamos los dedos
+                    image = [i.pixel_array for i in image]
+                    image = image.astype(np.float32)
         
         #
         # Es necesario armar un arreglo binario (0,1) para la etiqueta
