@@ -35,12 +35,12 @@ class ToTensor(object):
             try:
                 slices = sorted(sample, key=lambda s: s.SliceLocation)
                 image = [s.pixel_array for s in slices]
-                image = image.astype(np.float32)
+                image = np.array(image).astype(np.float32)
                 del slices
             except Exception as e:
                 # Cruzamos los dedos
                 image = [s.pixel_array for s in sample]
-                image = image.astype(np.float32)
+                image = np.array(image).astype(np.float32)
 
         if self.spacing is not None:
             # Nuevo tamaño de los voxel

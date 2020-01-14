@@ -87,12 +87,12 @@ class ADNI_Dataset(torch.utils.data.Dataset):
                 try:
                     slices = sorted(image, key=lambda i: i.SliceLocation)
                     image = [s.pixel_array for s in slices]
-                    image = image.astype(np.float32)
+                    image = np.array(image).astype(np.float32)
                     del slices
                 except Exception as e:
                     # Cruzamos los dedos
                     image = [i.pixel_array for i in image]
-                    image = image.astype(np.float32)
+                    image = np.array(image).astype(np.float32)
         
         #
         # Es necesario armar un arreglo binario (0,1) para la etiqueta
