@@ -32,7 +32,7 @@ class ADNI_Dataset(torch.utils.data.Dataset):
         self.image_files = {}
 
         for key, group in itertools.groupby(sorted(files), lambda i: re.search('I\d+', str(i)).group()):
-            self.image_files[key] = list(group)
+            self.image_files[key] = sorted(list(group))
         
         self.image_names = list(self.image_files.keys())
         
