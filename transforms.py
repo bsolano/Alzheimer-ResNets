@@ -46,9 +46,13 @@ class ToTensor(object):
             # Nuevo tamaño de los voxel
             new_spacing = self.spacing
 
-            # Tamaño actual de los voxel
-            spacing = map(float, ([sample[0].SliceThickness] + list(sample[0].PixelSpacing)))
-            spacing = np.array(list(spacing))
+            try:
+                # Tamaño actual de los voxel
+                spacing = map(float, ([sample[0].SliceThickness] + list(sample[0].PixelSpacing)))
+                spacing = np.array(list(spacing))
+            except Exception as e:
+                print(image[0])
+                raise e
 
             # Si los espaciados son diferentes
             if spacing[0] != new_spacing[0] and spacing[1] != new_spacing[1] and spacing[2] != new_spacing[2]:
