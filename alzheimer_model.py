@@ -34,6 +34,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def test():
+    import platform; print(platform.platform())
+    import sys; print('Python ', sys.version)
+    import pydicom; print('pydicom ', pydicom.__version__)
+    
     # Sets device to GPU if available, else CPU
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
