@@ -102,7 +102,7 @@ def test():
             # print statistics
             running_loss += loss.item()
             if i % 10 == 9:    # print every 10 batches
-                print('[epoch %d, batch %5d] pérdida: %.3f' % (epoch + 1, i + 1, running_loss / 200))
+                print('[epoch %d, batch %5d] pérdida: %.3f' % (epoch + 1, i + 1, running_loss / 10))
                 running_loss = 0.0
 
     model.eval()
