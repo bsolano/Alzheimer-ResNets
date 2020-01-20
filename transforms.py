@@ -52,7 +52,8 @@ class ToTensor(object):
                 spacing = np.array(list(spacing))
             except Exception as e:
                 print(sample[0][0x52009230])
-                print(sample[0][0x52009230].dir())
+                print(len(sample[0][0x52009230]))
+                print(sample[0][0x52009230][0][0x00289110])
                 raise e
 
             # Si los espaciados son diferentes
