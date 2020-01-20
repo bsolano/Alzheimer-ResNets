@@ -51,7 +51,7 @@ class ToTensor(object):
                 spacing = map(float, ([sample[0].SliceThickness] + list(sample[0].PixelSpacing)))
                 spacing = np.array(list(spacing))
             except Exception as e:
-                print(image[0])
+                print(image[0].dir())
                 raise e
 
             # Si los espaciados son diferentes
