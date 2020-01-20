@@ -1,5 +1,6 @@
 # Para la lectura de imágenes médicas
 import pydicom as dcm
+from dicom_numpy.exceptions import DicomImportException
 # Para la iteración en directorios
 from pathlib import Path
 # Para el agrupamiento
@@ -75,7 +76,11 @@ class ADNI_Dataset(torch.utils.data.Dataset):
         for file in self.image_files[key]:
             image.append(dcm.dcmread(file.as_posix()))
         if self.transform is not None:
-            image = self.transform(image)
+            try:
+                image = self.transform(image)
+            except Exception as e:
+                msg = "Error reading files: {}."
+                raise DicomImportException(msg.format(self.image_files[key]))
         else:
             # Obtenemos una lista de matrices numpy con los cortes, es decir, un cubo.
             try:
