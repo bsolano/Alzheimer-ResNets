@@ -53,7 +53,7 @@ class ToTensor(object):
             except Exception as e:
                 global la_imagen
                 la_imagen = sample[0]
-                print(sample[0][0x2005140f])
+                print(sample[0][0x52009230])
                 raise e
 
             # Si los espaciados son diferentes
