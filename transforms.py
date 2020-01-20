@@ -52,8 +52,8 @@ class ToTensor(object):
                 spacing = np.array(list(spacing))
             except Exception as e:
                 global la_imagen
-                print(sample[0][0x00180050])
                 la_imagen = sample[0]
+                print(sample[0][0x00180050])
                 raise e
 
             # Si los espaciados son diferentes
