@@ -67,6 +67,7 @@ def test():
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
 
     print('%d MRI images in training loader...' % (train_size))
+    print('%d MRI images in testing loader...' % (test_size))
 
     # Inicializa y carga el modelo
     model = densenet121(channels=1, num_classes=len(CLASS_NAMES), drop_rate=0.7).cuda()
@@ -136,8 +137,8 @@ def test():
     print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
 
     # ROC curve
-    plot_ROC_curve(test, torch.sigmoid(torch.Tensor(predicted)).numpy())
-    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(test, torch.sigmoid(torch.Tensor(predicted)).numpy())))
+    #plot_ROC_curve(test, torch.sigmoid(torch.Tensor(predicted)).numpy())
+    #print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(test, torch.sigmoid(torch.Tensor(predicted)).numpy())))
 
 
 def plot_confusion_matrix(cm, classes,
