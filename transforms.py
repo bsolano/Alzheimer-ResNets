@@ -47,7 +47,7 @@ class ToTensor(object):
                     # Tal vez es Phillips en cuyo caso todos los cortes están en el mismo archivo
                     image = sample[0].pixel_array
                     image = np.array(image).astype(np.float32)
-                    assert len(sample) > 1, 'There are no slices'
+                    assert len(image) > 1, 'There are no slices'
                 else:
                     # Cruzamos los dedos
                     image = [s.pixel_array for s in sample]
