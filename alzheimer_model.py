@@ -41,7 +41,6 @@ def test():
     # Sets device to GPU if available, else CPU
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
-    print()
 
     # Additional about GPU
     if device.type == 'cuda':
@@ -67,7 +66,7 @@ def test():
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
 
-    print('%d MRI images in training loader...' % (len(train_loader)))
+    print('%d MRI images in training loader...' % (train_size)
 
     # Inicializa y carga el modelo
     model = densenet121(channels=1, num_classes=len(CLASS_NAMES), drop_rate=0.7).cuda()
