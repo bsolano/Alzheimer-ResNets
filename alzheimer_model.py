@@ -192,7 +192,7 @@ def plot_confusion_matrix(cm, classes,
 
 
 def plot_ROC_curve(true, predicted, color = "red", label = None):
-    fp_r, tp_r, treshold = roc_curve(true, predicted)
+    fp_r, tp_r, treshold = roc_curve(true, predicted, pos_label=1)
     plt.plot(fp_r, tp_r, lw = 1, color = color, label = label)
     plt.plot([0, 1], [0, 1], lw = 1, color = "black")
     plt.xlabel("Rate of false positives")
