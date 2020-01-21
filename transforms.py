@@ -1,4 +1,9 @@
+import logging
+
 import dicom_numpy
+logger = logging.getLogger('dicom_numpy')
+logger.setLevel(logging.ERROR)
+
 import numpy as np
 import scipy
 import skimage.transform
@@ -30,17 +35,22 @@ class ToTensor(object):
             image, ijk_to_xyz = dicom_numpy.combine_slices(sample)
             image = image.astype(np.float32)
         except Exception as e:
-            # Invalid DICOM data
-            # We go without help
+            # Can not read DICOM data
+            # We go with our methods
             try:
                 slices = sorted(sample, key=lambda s: s.SliceLocation)
                 image = [s.pixel_array for s in slices]
                 image = np.array(image).astype(np.float32)
                 del slices
             except Exception as e:
-                # Cruzamos los dedos
-                image = [s.pixel_array for s in sample]
-                image = np.array(image).astype(np.float32)
+                if len(sample) == 1:
+                    # Tal vez es Phillips en cuyo caso todos los cortes están en el mismo archivo
+                    image = sample[0].pixel_array
+                    image = np.array(image).astype(np.float32)
+                else:
+                    # Cruzamos los dedos
+                    image = [s.pixel_array for s in sample]
+                    image = np.array(image).astype(np.float32)
 
         if self.spacing is not None:
             # Nuevo tamaño de los voxel
@@ -51,10 +61,9 @@ class ToTensor(object):
                 spacing = map(float, ([sample[0].SliceThickness] + list(sample[0].PixelSpacing)))
                 spacing = np.array(list(spacing))
             except Exception as e:
-                print(sample[0][0x52009230])
-                print(len(sample[0][0x52009230]))
-                print(sample[0][0x52009230][0][0x00289110])
-                raise e
+                # Tal vez es Phillips
+                spacing = map(float, ([sample[0][0x52009230][0][0x00289110][0][0x00180050].value] + list(sample[0][0x52009230][0][0x00289110][0][0x00280030].value)))
+                spacing = np.array(list(spacing))
 
             # Si los espaciados son diferentes
             if spacing[0] != new_spacing[0] and spacing[1] != new_spacing[1] and spacing[2] != new_spacing[2]:
