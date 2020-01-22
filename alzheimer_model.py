@@ -4,8 +4,8 @@
 The main implementation.
 """
 
-N_CLASSES = 6
 CLASS_NAMES = [ 'CN', 'SMC', 'EMCI', 'MCI', 'LMCI', 'AD']
+N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 BATCH_SIZE = 5
 EPOCHS = 1
@@ -29,6 +29,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
+from sklearn.preprocessing import label_binarize
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -137,8 +138,8 @@ def test():
     print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
 
     # ROC curve
-    #plot_ROC_curve(test, torch.sigmoid(torch.Tensor(predicted)).numpy())
-    #print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(test, torch.sigmoid(torch.Tensor(predicted)).numpy())))
+    plot_ROC_curve(label_binarize¶(test, classes=[i for N_CLASSES]), torch.sigmoid(torch.Tensor(label_binarize¶(predicted, classes=[i for N_CLASSES]))).numpy())
+    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(label_binarize¶(test, classes=[i for N_CLASSES]), torch.sigmoid(torch.Tensor(label_binarize¶(predicted, classes=[i for N_CLASSES]))).numpy())))
 
 
 def plot_confusion_matrix(cm, classes,
