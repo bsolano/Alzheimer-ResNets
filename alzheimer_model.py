@@ -138,8 +138,8 @@ def test():
     print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
 
     # ROC curve
-    plot_ROC_curve(label_binarize(test, classes=[i for N_CLASSES]), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for N_CLASSES]))).numpy())
-    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(label_binarize(test, classes=[i for N_CLASSES]), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for N_CLASSES]))).numpy())))
+    plot_ROC_curve(label_binarize(test, classes=[i for i in range(N_CLASSES)]), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for i in range(N_CLASSES)]))).numpy())
+    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(label_binarize(test, classes=[i for i in range(N_CLASSES)), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for i in range(N_CLASSES)]))).numpy())))
 
 
 def plot_confusion_matrix(cm, classes,
