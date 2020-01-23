@@ -128,7 +128,9 @@ def test():
 
     # Imprime la matriz de confusión
     test = [x.item() for x in test]
+    print('Test: {}'.format(test))
     predicted = [x.item() for x in predicted]
+    print('Predicted: {}'.format(predicted))
     cnf_matrix = confusion_matrix(test, predicted)
     plot_confusion_matrix(cnf_matrix, classes=CLASS_NAMES)
 
@@ -139,7 +141,7 @@ def test():
 
     # ROC curve
     plot_ROC_curve(label_binarize(test, classes=[i for i in range(N_CLASSES)]), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for i in range(N_CLASSES)]))).numpy())
-    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(label_binarize(test, classes=[i for i in range(N_CLASSES)), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for i in range(N_CLASSES)]))).numpy())))
+    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(label_binarize(test, classes=[i for i in range(N_CLASSES)]), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for i in range(N_CLASSES)]))).numpy())))
 
 
 def plot_confusion_matrix(cm, classes,
