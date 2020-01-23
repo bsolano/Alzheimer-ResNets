@@ -29,7 +29,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
-from sklearn.preprocessing import label_binarize
+from sklearn.preprocessing import LabelBinarizer
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -126,11 +126,14 @@ def test():
             _, predicted_value = torch.max(outputs.data, 1)
             predicted.append(predicted_value)
 
-    # Imprime la matriz de confusión
+    # Imprime la matriz de confusión    
+    lb = LabelBinarizer()
     test = [x.item() for x in test]
     print('Test: {}'.format(test))
+    print('Test transformed: {}'.format(lb.fit_transform(test)))
     predicted = [x.item() for x in predicted]
     print('Predicted: {}'.format(predicted))
+    print('Predicted transformed: {}'.format(lb.fit_transform(predicted)))
     cnf_matrix = confusion_matrix(test, predicted)
     plot_confusion_matrix(cnf_matrix, classes=CLASS_NAMES)
 
@@ -140,8 +143,8 @@ def test():
     print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
 
     # ROC curve
-    plot_ROC_curve(label_binarize(test, classes=[i for i in range(N_CLASSES)]), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for i in range(N_CLASSES)]))).numpy())
-    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(label_binarize(test, classes=[i for i in range(N_CLASSES)]), torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=[i for i in range(N_CLASSES)]))).numpy())))
+    plot_ROC_curve(lb.fit_transform(test), torch.sigmoid(torch.Tensor(lb.fit_transform(predicted))).numpy())
+    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(lb.fit_transform(test), torch.sigmoid(torch.Tensor(lb.fit_transform(predicted))).numpy())))
 
 
 def plot_confusion_matrix(cm, classes,
