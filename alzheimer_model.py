@@ -54,7 +54,7 @@ def test():
     cudnn.benchmark = True
 
     # Transformaciones de cada resonancia de magnética
-    transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='sagittal', cut=(slice(40,214,1),slice(50,200,1),slice(40,240,1)))]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
+    transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='sagittal', cut=(slice(40,214,2),slice(50,200,2),slice(40,240,2)))]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
 
     # Conjunto de datos con las transformaciones especificadas anteriormente
     adni_dataset = ADNI_Dataset(data_dir=DATA_DIR, transform=transform)
