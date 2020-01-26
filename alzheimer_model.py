@@ -129,11 +129,7 @@ def test():
     # Imprime la matriz de confusión    
     lb = LabelBinarizer()
     test = [x.item() for x in test]
-    print('Test: {}'.format(test))
-    print('Test transformed: {}'.format(lb.fit_transform(test)))
     predicted = [x.item() for x in predicted]
-    print('Predicted: {}'.format(predicted))
-    print('Predicted transformed: {}'.format(lb.fit_transform(predicted)))
     cnf_matrix = confusion_matrix(test, predicted)
     plot_confusion_matrix(cnf_matrix, classes=CLASS_NAMES)
 
