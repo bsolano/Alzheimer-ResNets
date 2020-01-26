@@ -1,9 +1,3 @@
-import logging
-
-import dicom_numpy
-logger = logging.getLogger('dicom_numpy')
-logger.setLevel(logging.ERROR)
-
 import numpy as np
 import scipy
 import skimage.transform
@@ -13,7 +7,7 @@ from numba import jit
 class ToTensor(object):
     """Convert pydicom image in sample to Tensors."""
 
-    def __init__(self, spacing=None, num_slices=None, aspect='sagittal', cut=(slice(None,None,1),slice(None,None,1))):
+    def __init__(self, spacing=None, num_slices=None, aspect='sagittal', cut=(slice(None,None,1),slice(None,None,1),slice(None,None,1))):
         if spacing is not None:
             assert isinstance(spacing, (list, tuple))
         if num_slices is not None:
@@ -32,26 +26,20 @@ class ToTensor(object):
 
         # Obtenemos una lista de matrices numpy con los cortes, es decir, un cubo.
         try:
-            image, ijk_to_xyz = dicom_numpy.combine_slices(sample)
-            image = image.astype(np.float32)
+            slices = sorted(sample, key=lambda s: s.SliceLocation)
+            image = [s.pixel_array for s in slices]
+            image = np.array(image).astype(np.float32)
+            del slices
         except Exception as e:
-            # Can not read DICOM data
-            # We go with our methods
-            try:
-                slices = sorted(sample, key=lambda s: s.SliceLocation)
-                image = [s.pixel_array for s in slices]
+            if len(sample) == 1:
+                # Tal vez es Phillips en cuyo caso todos los cortes están en el mismo archivo
+                image = sample[0].pixel_array
                 image = np.array(image).astype(np.float32)
-                del slices
-            except Exception as e:
-                if len(sample) == 1:
-                    # Tal vez es Phillips en cuyo caso todos los cortes están en el mismo archivo
-                    image = sample[0].pixel_array
-                    image = np.array(image).astype(np.float32)
-                    assert len(image) > 1, 'There are no slices'
-                else:
-                    # Cruzamos los dedos
-                    image = [s.pixel_array for s in sample]
-                    image = np.array(image).astype(np.float32)
+                assert len(image) > 1, 'There are no slices'
+            else:
+                # Cruzamos los dedos
+                image = [s.pixel_array for s in sample]
+                image = np.array(image).astype(np.float32)
 
         if self.spacing is not None:
             # Nuevo tamaño de los voxel
@@ -108,13 +96,11 @@ class ToTensor(object):
                 # Reconstrucción de la imagen al nuevo tamaño de voxel
                 image = scipy.ndimage.interpolation.zoom(image, real_resize_factor, order=1)
 
-        # Un canal:
+        # Un canal (asumiendo que las imágenes están en plano anatómico sagital):
         if self.aspect == 'sagittal':
             channel = [image[self.cut[0], self.cut[1], self.cut[2]]]
         elif self.aspect == 'axial':
-            image = np.rot90(image)
-            image = np.rot90(image, k=-1, axes=(1,2))
-            channel = [image[self.cut[0], self.cut[1], self.cut[2]]]
+            pass
         elif self.aspect == 'coronal':
             pass
 
