@@ -1,6 +1,5 @@
 # Para la lectura de imágenes médicas
 import pydicom as dcm
-from dicom_numpy.exceptions import DicomImportException
 # Para la iteración en directorios
 from pathlib import Path
 # Para el agrupamiento
@@ -80,23 +79,23 @@ class ADNI_Dataset(torch.utils.data.Dataset):
                 image = self.transform(image)
             except Exception as e:
                 msg = "Error reading files: {}."
-                raise DicomImportException(msg.format(self.image_files[key]))
+                raise Exception(msg.format(self.image_files[key]))
         else:
             # Obtenemos una lista de matrices numpy con los cortes, es decir, un cubo.
             try:
-                image, ijk_to_xyz = dicom_numpy.combine_slices(image)
-                image = image.astype(np.float32)
+                slices = sorted(sample, key=lambda s: s.SliceLocation)
+                image = [s.pixel_array for s in slices]
+                image = np.array(image).astype(np.float32)
+                del slices
             except Exception as e:
-                # Invalid DICOM data
-                # We go without help
-                try:
-                    slices = sorted(image, key=lambda i: i.SliceLocation)
-                    image = [s.pixel_array for s in slices]
+                if len(sample) == 1:
+                    # Tal vez es Phillips en cuyo caso todos los cortes están en el mismo archivo
+                    image = sample[0].pixel_array
                     image = np.array(image).astype(np.float32)
-                    del slices
-                except Exception as e:
+                    assert len(image) > 1, 'There are no slices'
+                else:
                     # Cruzamos los dedos
-                    image = [i.pixel_array for i in image]
+                    image = [s.pixel_array for s in sample]
                     image = np.array(image).astype(np.float32)
         
         #
