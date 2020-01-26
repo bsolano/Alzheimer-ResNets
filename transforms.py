@@ -7,7 +7,7 @@ from numba import jit
 class ToTensor(object):
     """Convert pydicom image in sample to Tensors."""
 
-    def __init__(self, spacing=None, num_slices=None, aspect='sagittal', cut=(slice(None,None,1),slice(None,None,1),slice(None,None,1))):
+    def __init__(self, spacing=None, num_slices=None, aspect='sagittal', cut=(slice(None,None,1),slice(None,None,1),slice(None,None,1)), normalize=True):
         if spacing is not None:
             assert isinstance(spacing, (list, tuple))
         if num_slices is not None:
@@ -103,5 +103,8 @@ class ToTensor(object):
             pass
         elif self.aspect == 'coronal':
             pass
+
+        if normalize is not None:
+            channel = 2*channel/255-1
 
         return torch.from_numpy(np.array(channel))
