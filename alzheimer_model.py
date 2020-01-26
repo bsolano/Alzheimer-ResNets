@@ -54,7 +54,7 @@ def test():
     cudnn.benchmark = True
 
     # Transformaciones de cada resonancia de magnética
-    transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='axial', cut=(slice(100,200,1),slice(60,220,1),slice(90,200,1)))]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
+    transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='sagittal', cut=(slice(40,214,1),slice(50,200,1),slice(40,240,1)))]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
 
     # Conjunto de datos con las transformaciones especificadas anteriormente
     adni_dataset = ADNI_Dataset(data_dir=DATA_DIR, transform=transform)
@@ -143,9 +143,7 @@ def test():
     print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
 
     # ROC curve
-    plot_ROC_curve(lb.fit_transform(test), torch.sigmoid(torch.Tensor(lb.fit_transform(predicted))).numpy())
-    print("Area Under ROC Curve (AUROC): {:.3f}".format(roc_auc_score(lb.fit_transform(test), torch.sigmoid(torch.Tensor(lb.fit_transform(predicted))).numpy())))
-
+    #plot_ROC_curve(lb.fit_transform(test), torch.sigmoid(torch.Tensor(lb.fit_transform(predicted))).numpy())
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
