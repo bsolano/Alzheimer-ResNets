@@ -16,6 +16,7 @@ class ToTensor(object):
         self.num_slices = num_slices
         self.aspect = aspect
         self.cut = cut
+        self.normalize = normalize
 
     #@jit(nopython=True, parallel=True)
     def __call__(self, sample):
@@ -104,7 +105,7 @@ class ToTensor(object):
         elif self.aspect == 'coronal':
             pass
 
-        if normalize is not None:
+        if self.normalize is not None:
             channel = 2*channel/255-1
 
         return torch.from_numpy(np.array(channel))
