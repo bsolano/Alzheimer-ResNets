@@ -106,6 +106,6 @@ class ToTensor(object):
             pass
 
         if self.normalize is not None:
-            channel = 2*channel/255-1
+            channel = 2*np.array(channel)/255-1
 
-        return torch.from_numpy(np.array(channel))
+        return torch.from_numpy(channel)
