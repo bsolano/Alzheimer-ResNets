@@ -8,7 +8,7 @@ CLASS_NAMES = [ 'CN', 'SMC', 'EMCI', 'MCI', 'LMCI', 'AD']
 N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 BATCH_SIZE = 5
-EPOCHS = 1
+EPOCHS = 3
 
 from transforms import ToTensor
 from adni_dataset import ADNI_Dataset
@@ -84,7 +84,7 @@ def test():
 
     # Optimizador:
     # Estas son optimizaciones al algoritmo de descenso por gradiente para evitar mínimos locales en la búsqueda.
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.5) # SGD: Descenso por gradiente estocástico
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9) # SGD: Descenso por gradiente estocástico
 
     # Ciclo de entrenamiento:
     for epoch in range(EPOCHS):
