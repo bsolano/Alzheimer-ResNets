@@ -9,7 +9,7 @@ N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 DATA_DIR = './NumpyADNI'
 BATCH_SIZE = 5
-EPOCHS = 3
+EPOCHS = 50
 
 from transforms import ToTensor
 from adni_dataset import ADNI_Dataset
@@ -62,7 +62,7 @@ def test():
     adni_dataset = NumpyADNI_Dataset(data_dir=DATA_DIR)
 
     # Entrenamiento y prueba
-    train_size = int(0.7 * len(adni_dataset))
+    train_size = int(0.75 * len(adni_dataset))
     test_size = len(adni_dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
