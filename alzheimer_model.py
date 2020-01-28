@@ -13,6 +13,7 @@ EPOCHS = 3
 
 from transforms import ToTensor
 from adni_dataset import ADNI_Dataset
+from adni_dataset import NumpyADNI_Dataset
 
 from models.densenet import densenet121
 
