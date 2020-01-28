@@ -1,15 +1,10 @@
-# Para la lectura de imágenes médicas
 import pydicom as dcm
-# Para la iteración en directorios
-from pathlib import Path
-# Para el agrupamiento
 import itertools
-# Para las expresiones regulares
 import re
-# Para manejar el archivo con las etiquetas
 import csv
-# Para el tensor
 import torch
+import numpy as np
+from pathlib import Path
 
 class ADNI_Dataset(torch.utils.data.Dataset):
     def __init__(self, data_dir='ADNI', class_names=['CN','SMC','EMCI','MCI','LMCI','AD'], transform=None):
