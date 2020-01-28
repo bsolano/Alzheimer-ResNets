@@ -141,6 +141,7 @@ def main():
 
     del files # Conserva memoria
 
+    files = 0
     for index in range(len(image_names)):
 
         key = image_names[index]
@@ -180,11 +181,10 @@ def main():
             else:
                 label.append(0)
         
-        files = 0
         filename = SAVE_DIR+'/'+labels[key]+'/'+key+'.np'
         with open(filename, 'wb') as file:
             print('Saving {}...'.format(filename))
-            np.save(file, np.array([image, label]))
+            np.save(file, np.array([np.array([image]), np.array(label)]))
             files += 1
             file.close()
             
