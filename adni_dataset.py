@@ -131,7 +131,7 @@ class NumpyADNI_Dataset(torch.utils.data.Dataset):
         
         with file.open(mode='rb') as data:
             (image, label) = np.load(data, allow_pickle=True)
-            file.close()
+            data.close()
 
         return torch.from_numpy(np.array([image])), torch.from_numpy(np.array(label))
 
