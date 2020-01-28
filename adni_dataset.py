@@ -11,10 +11,8 @@ import csv
 # Para el tensor
 import torch
 
-CLASS_NAMES = [ 'CN', 'SMC', 'EMCI', 'MCI', 'LMCI', 'AD']
-
 class ADNI_Dataset(torch.utils.data.Dataset):
-    def __init__(self, data_dir='ADNI', transform=None):
+    def __init__(self, data_dir='ADNI', class_names=['CN','SMC','EMCI','MCI','LMCI','AD'], transform=None):
         ''' '''
 
         #
@@ -35,11 +33,9 @@ class ADNI_Dataset(torch.utils.data.Dataset):
             self.image_files[key] = sorted(list(group))
         
         self.image_names = list(self.image_files.keys())
-        
-        del files # Conserva memoria
-
-        self.transform = transform        
-
+        self.transform = transform
+        self.class_names = class_names
+        self.labels = self.__getlabels__()
 
     def __getlabels__(self):
         ''' '''
@@ -49,7 +45,7 @@ class ADNI_Dataset(torch.utils.data.Dataset):
             index = 0
             for row in reader:
                 if index != 0:
-                    labels['I' + row[0]] = row[2]
+                    labels['I' + row[0]] = row[1]
                 index += 1
         return labels
 
@@ -59,7 +55,7 @@ class ADNI_Dataset(torch.utils.data.Dataset):
         Args:
             index: the index of item
         Returns:
-            image and its labels
+            image and its label
         """
         
         if torch.is_tensor(index):
@@ -101,15 +97,48 @@ class ADNI_Dataset(torch.utils.data.Dataset):
         #
         # Es necesario armar un arreglo binario (0,1) para la etiqueta
         #
-        labels = self.__getlabels__()
         label = []
-        for c in CLASS_NAMES:
-            if c == labels[key]:
+        for c in self.class_names:
+            if c == self.labels[key]:
                 label.append(1)
             else:
                 label.append(0)
 
         return image, torch.LongTensor(label)
+
+    def __len__(self):
+        return len(self.image_names)
+
+
+class NumpyADNI_Dataset(torch.utils.data.Dataset):
+    def __init__(self, data_dir='NumpyADNI'):
+        ''' '''
+
+        #
+        # Obtiene el listado de todos los archivos *.np en el directorio NumpyADNI.
+        #
+        self.image_files = list(Path(data_dir).rglob("*.np"))
+
+        self.image_names = [file.name[:-3] for file in self.image_files]
+
+    def __getitem__(self, index):
+        """
+        Args:
+            index: the index of item
+        Returns:
+            image and its label
+        """
+        
+        if torch.is_tensor(index):
+            index = index.tolist()
+        
+        file = self.image_files[index]
+        
+        with file.open(mode='rb') as data:
+            (image, label) = np.load(data, allow_pickle=True)
+            file.close()
+
+        return torch.from_numpy(np.array([image])), torch.from_numpy(np.array(label))
 
     def __len__(self):
         return len(self.image_names)
