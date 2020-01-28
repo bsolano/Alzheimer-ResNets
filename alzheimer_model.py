@@ -7,6 +7,7 @@ The main implementation.
 CLASS_NAMES = [ 'CN', 'SMC', 'EMCI', 'MCI', 'LMCI', 'AD']
 N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
+DATA_DIR = './NumpyADNI'
 BATCH_SIZE = 5
 EPOCHS = 3
 
@@ -54,10 +55,10 @@ def test():
     cudnn.benchmark = True
 
     # Transformaciones de cada resonancia de magnética
-    transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='sagittal', cut=(slice(40,214,2),slice(50,200,2),slice(40,240,2)), normalize=True)]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
+    #transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='sagittal', cut=(slice(40,214,2),slice(50,200,2),slice(40,240,2)), normalize=True)]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
 
     # Conjunto de datos con las transformaciones especificadas anteriormente
-    adni_dataset = ADNI_Dataset(data_dir=DATA_DIR, transform=transform)
+    adni_dataset = NumpyADNI_Dataset(data_dir=DATA_DIR)
 
     # Entrenamiento y prueba
     train_size = int(0.7 * len(adni_dataset))
@@ -106,8 +107,8 @@ def test():
 
             # print statistics
             running_loss += loss.item()
-            if i % 10 == 9:    # print every 10 batches
-                print('[epoch %d, batch %5d] pérdida: %.3f' % (epoch + 1, i + 1, running_loss / 10))
+            if i % 100 == 99:    # print every 100 batches
+                print('[epoch %d, batch %5d] pérdida: %.3f' % (epoch + 1, i + 1, running_loss / 100))
                 running_loss = 0.0
 
     model.eval()
