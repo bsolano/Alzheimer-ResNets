@@ -4,7 +4,7 @@
 The main implementation.
 """
 
-CLASS_NAMES = [ 'CN', 'SMC', 'EMCI', 'MCI', 'LMCI', 'AD']
+CLASS_NAMES = ['CN','SMC','EMCI','MCI','LMCI','AD']
 N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 DATA_DIR = './NumpyADNI'
@@ -25,13 +25,15 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from torchsummary import summary
 
+from scipy import interp
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import label_binarize
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -128,8 +130,7 @@ def test():
             _, predicted_value = torch.max(outputs.data, 1)
             predicted.append(predicted_value)
 
-    # Imprime la matriz de confusión    
-    lb = LabelBinarizer()
+    # Imprime la matriz de confusión
     test = [x.item() for x in test]
     predicted = [x.item() for x in predicted]
     cnf_matrix = confusion_matrix(test, predicted)
@@ -137,11 +138,79 @@ def test():
 
     # Imprime estadísticas
     print('Accuracy: ', accuracy_score(test, predicted))
-    print('Specificity (precision)', precision_score(test, predicted, average='macro'))
-    print('Sensitivity (recall)', recall_score(test, predicted, average='macro'))
+    print('Specificity (precision) - micro', precision_score(test, predicted, average='micro'))
+    print('Sensitivity (recall) - micro', recall_score(test, predicted, average='micro'))
 
     # ROC curve
-    #plot_ROC_curve(lb.fit_transform(test), torch.sigmoid(torch.Tensor(lb.fit_transform(predicted))).numpy())
+    plot_ROC_curve(test, predicted, classes=CLASS_NAMES)
+
+
+def plot_ROC_curve(true, predicted, classes):
+    """
+    Uses code from https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
+    """
+    
+    # Data
+    true = label_binarize(true, classes=list(range(classes)))    
+    predicted = torch.sigmoid(torch.Tensor(predicted)).numpy()
+    n_classes = true.shape[1]
+
+    # Line width
+    lw = 2
+
+    # Compute ROC curve and ROC area for each class
+    fpr = {}
+    tpr = {}
+    roc_auc = {}
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(true[:, i], predicted[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    # Compute micro-average ROC curve and ROC area
+    fpr["micro"], tpr["micro"], _ = roc_curve(true.ravel(), predicted.ravel())
+    roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+    # First aggregate all false positive rates
+    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+
+    # Then interpolate all ROC curves at this points
+    mean_tpr = np.zeros_like(all_fpr)
+    for i in range(n_classes):
+        mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+    # Finally average it and compute AUC
+    mean_tpr /= n_classes
+
+    fpr["macro"] = all_fpr
+    tpr["macro"] = mean_tpr
+    roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
+
+    # Plot all ROC curves
+    plt.figure()
+    plt.plot(fpr["micro"], tpr["micro"],
+             label='micro-average ROC curve (area = {0:0.2f})'
+                   ''.format(roc_auc["micro"]),
+             color='C0', linestyle=':', linewidth=4)
+
+    plt.plot(fpr["macro"], tpr["macro"],
+             label='macro-average ROC curve (area = {0:0.2f})'
+                   ''.format(roc_auc["macro"]),
+             color='C1', linestyle=':', linewidth=4)
+
+    for i in range(n_classes):
+        plt.plot(fpr[i], tpr[i], color='C'+str(i+2), lw=lw,
+                 label='ROC curve of class {0} (area = {1:0.2f})'
+                 ''.format(classes[i] if classes is not None else i, roc_auc[i]))
+
+    plt.plot([0, 1], [0, 1], 'k--', lw=lw)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.legend(loc="lower right")
+    plt.show()
+    plt.close()
+
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -191,15 +260,7 @@ def plot_confusion_matrix(cm, classes,
                     color="white" if cm[i, j] > thresh else "black")
     fig.tight_layout()
     plt.show()
-
-
-def plot_ROC_curve(true, predicted, color = "red", label = None):
-    fp_r, tp_r, treshold = roc_curve(true, predicted, pos_label=1)
-    plt.plot(fp_r, tp_r, lw = 1, color = color, label = label)
-    plt.plot([0, 1], [0, 1], lw = 1, color = "black")
-    plt.xlabel("Rate of false positives")
-    plt.ylabel("Rate of false negatives")
-    plt.title("ROC curve")
+    plt.close()
 
 
 # Si corre como programa principal y no como módulo:
