@@ -151,8 +151,8 @@ def plot_ROC_curve(true, predicted, classes):
     """
     
     # Data
-    true = label_binarize(true, classes=list(range(classes)))    
-    predicted = torch.sigmoid(torch.Tensor(predicted)).numpy()
+    true = label_binarize(true, classes=list(range(len(classes))))    
+    predicted = torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=list(range(len(classes)))))).numpy()
     n_classes = true.shape[1]
 
     # Line width
@@ -186,7 +186,7 @@ def plot_ROC_curve(true, predicted, classes):
     roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 
     # Plot all ROC curves
-    plt.figure()
+    plt.figure(figsize=(10,10))
     plt.plot(fpr["micro"], tpr["micro"],
              label='micro-average ROC curve (area = {0:0.2f})'
                    ''.format(roc_auc["micro"]),
@@ -199,7 +199,7 @@ def plot_ROC_curve(true, predicted, classes):
 
     for i in range(n_classes):
         plt.plot(fpr[i], tpr[i], color='C'+str(i+2), lw=lw,
-                 label='ROC curve of class {0} (area = {1:0.2f})'
+                 label='ROC curve of {0} (area = {1:0.2f})'
                  ''.format(classes[i] if classes is not None else i, roc_auc[i]))
 
     plt.plot([0, 1], [0, 1], 'k--', lw=lw)
