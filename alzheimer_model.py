@@ -25,9 +25,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from torchsummary import summary
 
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
+from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
@@ -136,9 +134,7 @@ def test():
     plot_confusion_matrix(cnf_matrix, classes=CLASS_NAMES)
 
     # Imprime estadísticas
-    print('Accuracy: ', accuracy_score(test, predicted))
-    print('Specificity (precision) - micro', precision_score(test, predicted, average='micro'))
-    print('Sensitivity (recall) - micro', recall_score(test, predicted, average='micro'))
+    print(classification_report(test, predicted, target_names=CLASS_NAMES))
 
     # ROC curve
     plot_ROC_curve(test, predicted, classes=CLASS_NAMES)
