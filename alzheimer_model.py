@@ -25,7 +25,6 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from torchsummary import summary
 
-from scipy import interp
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
@@ -176,7 +175,7 @@ def plot_ROC_curve(true, predicted, classes):
     # Then interpolate all ROC curves at this points
     mean_tpr = np.zeros_like(all_fpr)
     for i in range(n_classes):
-        mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+        mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
 
     # Finally average it and compute AUC
     mean_tpr /= n_classes
