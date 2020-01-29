@@ -74,19 +74,19 @@ class ADNI_Dataset(torch.utils.data.Dataset):
         else:
             # Obtenemos una lista de matrices numpy con los cortes, es decir, un cubo.
             try:
-                slices = sorted(sample, key=lambda s: s.SliceLocation)
+                slices = sorted(image, key=lambda s: s.SliceLocation)
                 image = [s.pixel_array for s in slices]
                 image = np.array(image).astype(np.float32)
                 del slices
             except Exception as e:
-                if len(sample) == 1:
+                if len(image) == 1:
                     # Tal vez es Phillips en cuyo caso todos los cortes están en el mismo archivo
-                    image = sample[0].pixel_array
+                    image = image[0].pixel_array
                     image = np.array(image).astype(np.float32)
                     assert len(image) > 1, 'There are no slices'
                 else:
                     # Cruzamos los dedos
-                    image = [s.pixel_array for s in sample]
+                    image = [s.pixel_array for s in image]
                     image = np.array(image).astype(np.float32)
         
         #
