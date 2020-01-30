@@ -1,3 +1,4 @@
+import torch
 import pydicom as dcm
 import itertools
 import re
