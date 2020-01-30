@@ -9,7 +9,8 @@ N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 DATA_DIR = './NumpyADNI'
 BATCH_SIZE = 5
-EPOCHS = 50
+EPOCHS = 100
+RESULTS_DIR = './results'
 
 from transforms import ToTensor
 from adni_dataset import ADNI_Dataset
@@ -61,7 +62,7 @@ def test():
     adni_dataset = NumpyADNI_Dataset(data_dir=DATA_DIR)
 
     # Entrenamiento y prueba
-    train_size = int(0.75 * len(adni_dataset))
+    train_size = int(0.8 * len(adni_dataset))
     test_size = len(adni_dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
@@ -88,6 +89,7 @@ def test():
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9) # SGD: Descenso por gradiente estocástico
 
     # Ciclo de entrenamiento:
+    losses = []
     for epoch in range(EPOCHS):
         running_loss = 0.0
         for i, data in enumerate(train_loader):
@@ -107,9 +109,11 @@ def test():
 
             # print statistics
             running_loss += loss.item()
-            if i % 100 == 99:    # print every 100 batches
-                print('[epoch %d, batch %5d] pérdida: %.3f' % (epoch + 1, i + 1, running_loss / 100))
-                running_loss = 0.0
+            
+        print('[epoch %d] pérdida: %.3f' % (epoch + 1, running_loss / train_size))
+        losses.append([epoch + 1, running_loss / train_size])
+        
+    torch.save(model.state_dict(), RESULTS_DIR+'/'+device+'-alzheimer-densenet121.pth')
 
     model.eval()
     test = []
@@ -131,14 +135,24 @@ def test():
     test = [x.item() for x in test]
     predicted = [x.item() for x in predicted]
     cnf_matrix = confusion_matrix(test, predicted)
-    plot_confusion_matrix(cnf_matrix, classes=CLASS_NAMES)
+    plot_confusion_matrix(cnf_matrix, title='', classes=CLASS_NAMES)
 
     # Imprime estadísticas
     print(classification_report(test, predicted, target_names=CLASS_NAMES))
 
     # ROC curve
     plot_ROC_curve(test, predicted, classes=CLASS_NAMES)
+    
 
+def plot_loss(losses):
+    x = [losses[i][0] for i in range(len(losses))]
+    y = [losses[i][1] for i in range(len(losses))]
+
+    plt.plot(x, y, 'r')
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+    plt.show()
+    plt.close()
 
 def plot_ROC_curve(true, predicted, classes):
     """
@@ -181,7 +195,7 @@ def plot_ROC_curve(true, predicted, classes):
     roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 
     # Plot all ROC curves
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(8,8))
     plt.plot(fpr["micro"], tpr["micro"],
              label='micro-average ROC curve (area = {0:0.2f})'
                    ''.format(roc_auc["micro"]),
@@ -199,7 +213,7 @@ def plot_ROC_curve(true, predicted, classes):
 
     plt.plot([0, 1], [0, 1], 'k--', lw=lw)
     plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
+    plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.legend(loc="lower right")
