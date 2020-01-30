@@ -140,6 +140,9 @@ def test():
     # Imprime estadísticas
     print(classification_report(test, predicted, target_names=CLASS_NAMES))
 
+    # loss plot
+    plot_loss(losses)
+
     # ROC curve
     plot_ROC_curve(test, predicted, classes=CLASS_NAMES)
     
@@ -195,7 +198,7 @@ def plot_ROC_curve(true, predicted, classes):
     roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 
     # Plot all ROC curves
-    plt.figure(figsize=(8,8))
+    plt.figure(figsize=(7,7))
     plt.plot(fpr["micro"], tpr["micro"],
              label='micro-average ROC curve (area = {0:0.2f})'
                    ''.format(roc_auc["micro"]),
