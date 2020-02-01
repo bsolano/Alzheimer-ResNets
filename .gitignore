@@ -1,6 +1,6 @@
 /.vscode
+/.mypy_cache
 /ADNI
 /NumpyADNI
 /__pycache__
 /models/__pycache__
-/mypy_cache
