@@ -113,7 +113,7 @@ def test():
         print('[epoch %d] pérdida: %.3f' % (epoch + 1, running_loss / train_size))
         losses.append([epoch + 1, running_loss / train_size])
         
-    torch.save(model.state_dict(), RESULTS_DIR+'/'+device+'-alzheimer-densenet121.pth')
+    torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-alzheimer-densenet121.pth')
 
     model.eval()
     test = []
@@ -138,7 +138,7 @@ def test():
     plot_confusion_matrix(cnf_matrix, title='', classes=CLASS_NAMES)
 
     # Imprime estadísticas
-    print(classification_report(test, predicted, target_names=CLASS_NAMES))
+    print(classification_report(test, predicted, labels=list(range(N_CLASSES)), target_names=CLASS_NAMES))
 
     # loss plot
     plot_loss(losses)
