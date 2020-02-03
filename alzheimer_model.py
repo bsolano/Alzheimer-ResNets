@@ -9,7 +9,7 @@ N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 DATA_DIR = './NumpyADNI'
 BATCH_SIZE = 5
-EPOCHS = 80
+EPOCHS = 90
 RESULTS_DIR = './results'
 
 from transforms import ToTensor
@@ -91,7 +91,7 @@ def test():
     # Ciclo de entrenamiento:
     losses = []
     for epoch in range(EPOCHS):
-        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[59,69])
+        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[39,69])
         running_loss = 0.0
         for i, data in enumerate(train_loader):
             # get the inputs; data is a list of [inputs, labels]
@@ -113,8 +113,8 @@ def test():
             
         print('[epoch %d] pérdida: %.3f' % (epoch + 1, running_loss / train_size))
         losses.append([epoch + 1, running_loss / train_size])
-        if epoch % 10 == 0:
-            torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-densenet121.pth')
+        if epoch % 10 == 9:
+            torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-epoch-'+str(epoch+1)+'-alzheimer-densenet121.pth')
         
     torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-alzheimer-densenet121.pth')
 
