@@ -9,7 +9,7 @@ N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 DATA_DIR = './NumpyADNI'
 BATCH_SIZE = 5
-EPOCHS = 100
+EPOCHS = 80
 RESULTS_DIR = './results'
 
 from transforms import ToTensor
@@ -91,6 +91,7 @@ def test():
     # Ciclo de entrenamiento:
     losses = []
     for epoch in range(EPOCHS):
+        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[59,79])
         running_loss = 0.0
         for i, data in enumerate(train_loader):
             # get the inputs; data is a list of [inputs, labels]
@@ -112,6 +113,8 @@ def test():
             
         print('[epoch %d] pérdida: %.3f' % (epoch + 1, running_loss / train_size))
         losses.append([epoch + 1, running_loss / train_size])
+        if epoch % 10 == 0:
+            torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-densenet121.pth')
         
     torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-alzheimer-densenet121.pth')
 
@@ -145,7 +148,18 @@ def test():
 
     # ROC curve
     plot_ROC_curve(test, predicted, classes=CLASS_NAMES)
+
+
+def lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[]):
+    """Decay learning rate by lr_decay on predefined epochs"""
+    if epoch not in lr_decay_epochs:
+        return optimizer
     
+    for param_group in optimizer.param_groups:
+        param_group['lr'] *= lr_decay
+
+    return optimizer
+
 
 def plot_loss(losses):
     x = [losses[i][0] for i in range(len(losses))]
