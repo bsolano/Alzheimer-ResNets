@@ -91,7 +91,7 @@ def test():
     # Ciclo de entrenamiento:
     losses = []
     for epoch in range(EPOCHS):
-        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[59,79])
+        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[59,69])
         running_loss = 0.0
         for i, data in enumerate(train_loader):
             # get the inputs; data is a list of [inputs, labels]
