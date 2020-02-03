@@ -9,7 +9,7 @@ import scipy
 import skimage.transform
 import os
 
-CLASS_NAMES = [ 'CN', 'SMC', 'EMCI', 'MCI', 'LMCI', 'AD']
+CLASS_NAMES = [ 'CN', 'EMCI', 'MCI', 'LMCI', 'AD']
 DATA_DIR = './ADNI'
 SAVE_DIR = './NumpyADNI'
 

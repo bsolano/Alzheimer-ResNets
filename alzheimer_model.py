@@ -4,7 +4,7 @@
 The main implementation.
 """
 
-CLASS_NAMES = ['CN','SMC','EMCI','MCI','LMCI','AD']
+CLASS_NAMES = ['CN','EMCI','MCI','LMCI','AD']
 N_CLASSES = len(CLASS_NAMES)
 DATA_DIR = './ADNI'
 DATA_DIR = './NumpyADNI'
