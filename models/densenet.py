@@ -190,10 +190,7 @@ class DenseNet(nn.Module):
         self.features.add_module('norm5', nn.BatchNorm3d(num_features))
 
         # Linear layer
-        self.classifier = nn.Sequential(
-            nn.Linear(num_features, num_classes),
-            nn.Sigmoid()
-        )
+        self.classifier = nn.Linear(num_features, num_classes)
         self.final_num_features = num_features
 
         for m in self.modules():
