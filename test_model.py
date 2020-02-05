@@ -47,8 +47,8 @@ def test(file, class_names, data_dir, results_dir):
 
     # Inicializa, carga y corre el modelo
     model = densenet121(channels=1, num_classes=len(class_names), drop_rate=0.7).cuda()
-    model.load_state_dict(torch.load(results_dir+'/'+file))
     model = torch.nn.DataParallel(model).to(device)
+    model.load_state_dict(torch.load(results_dir+'/'+file))
     model.eval()
     test = []
     predicted = []
