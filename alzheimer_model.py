@@ -7,7 +7,7 @@ The main implementation.
 from transforms import ToTensor
 from adni_dataset import ADNI_Dataset
 from adni_dataset import NumpyADNI_Dataset
-import lib.functions
+from lib.functions import *
 
 from models.densenet import densenet121
 

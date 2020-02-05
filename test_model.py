@@ -5,7 +5,7 @@ The main implementation.
 """
 import sys
 
-import lib.functions
+from lib.functions import *
 from models.densenet import densenet121
 from adni_dataset import NumpyADNI_Dataset
 
