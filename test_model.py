@@ -7,6 +7,7 @@ import sys
 
 import lib.functions
 from models.densenet import densenet121
+from adni_dataset import NumpyADNI_Dataset
 
 import torch
 import torch.nn as nn
