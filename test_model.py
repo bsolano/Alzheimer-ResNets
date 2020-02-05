@@ -34,7 +34,7 @@ def test(file, class_names, data_dir, results_dir):
     cudnn.benchmark = True
 
     # Conjunto de datos con las transformaciones especificadas anteriormente
-    adni_dataset = NumpyADNI_Dataset(data_dir=DATA_DIR)
+    adni_dataset = NumpyADNI_Dataset(data_dir=data_dir)
 
     # Entrenamiento y prueba
     train_size = int(0.75 * len(adni_dataset))
