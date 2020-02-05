@@ -11,6 +11,8 @@ from sklearn.preprocessing import label_binarize
 import matplotlib.pyplot as plt
 import numpy as np
 
+import torch
+
 def print_info_and_plots(test, predicted, class_names, losses=None):
     cnf_matrix = confusion_matrix(test, predicted)
     plot_confusion_matrix(cnf_matrix, title='', classes=class_names)
