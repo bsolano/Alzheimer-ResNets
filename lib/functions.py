@@ -11,7 +11,7 @@ from sklearn.preprocessing import label_binarize
 import matplotlib.pyplot as plt
 import numpy as np
 
-def print_info_and_plots(test, predicted, class_names):
+def print_info_and_plots(test, predicted, class_names, losses=None):
     cnf_matrix = confusion_matrix(test, predicted)
     plot_confusion_matrix(cnf_matrix, title='', classes=class_names)
 
@@ -25,7 +25,8 @@ def print_info_and_plots(test, predicted, class_names):
     print('Sensitivity (recall) - macro', recall_score(test, predicted, average='macro'))
 
     # loss plot
-    plot_loss(losses)
+    if (losses is not None):
+        plot_loss(losses)
 
     # ROC curve
     plot_ROC_curve(test, predicted, classes=class_names)

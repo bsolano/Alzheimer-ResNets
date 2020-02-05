@@ -121,7 +121,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size):
     predicted = [x.item() for x in predicted]
 
     # Imprime estadísticas y gráficos
-    print_info_and_plots(test, predicted, class_names)
+    print_info_and_plots(test, predicted, class_names, losses)
 
 
 def lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[]):
