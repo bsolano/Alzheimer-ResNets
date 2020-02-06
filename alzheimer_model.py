@@ -141,5 +141,5 @@ if __name__ == '__main__':
     test(class_names=['CN','EMCI','MCI','LMCI','AD'],
          data_dir='./NumpyADNI',
          results_dir='./results',
-         epochs=80,
+         epochs=100,
          batch_size=5)
