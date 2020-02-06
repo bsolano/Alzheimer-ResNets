@@ -74,7 +74,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size):
     # Ciclo de entrenamiento:
     losses = []
     for epoch in range(epochs):
-        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[39,69])
+        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[59])
         running_loss = 0.0
         for i, data in enumerate(train_loader):
             # get the inputs; data is a list of [inputs, labels]
@@ -141,5 +141,5 @@ if __name__ == '__main__':
     test(class_names=['CN','EMCI','MCI','LMCI','AD'],
          data_dir='./NumpyADNI',
          results_dir='./results',
-         epochs=100,
+         epochs=110,
          batch_size=5)
