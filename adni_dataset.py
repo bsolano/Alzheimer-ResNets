@@ -135,7 +135,6 @@ class NumpyADNI_Dataset(torch.utils.data.Dataset):
             data.close()
 
         del label[1]
-        print(self.image_names[index]+': '+str(label))
         return torch.from_numpy(np.array([image])), torch.from_numpy(np.array(label))
 
     def __len__(self):
