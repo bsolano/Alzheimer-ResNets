@@ -86,7 +86,7 @@ def plot_ROC_curve(true, predicted, classes):
     roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 
     # Plot all ROC curves
-    plt.figure(figsize=(7,7))
+    plt.figure(figsize=(6,6))
     plt.plot(fpr["micro"], tpr["micro"],
              label='micro-average ROC curve (area = {0:0.2f})'
                    ''.format(roc_auc["micro"]),
@@ -102,7 +102,6 @@ def plot_ROC_curve(true, predicted, classes):
                  label='ROC curve of {0} (area = {1:0.2f})'
                  ''.format(classes[i] if classes is not None else i, roc_auc[i]))
 
-    plt.plot([0, 1], [0, 1], 'k--', lw=lw)
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
