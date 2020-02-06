@@ -121,7 +121,7 @@ def plot_confusion_matrix(cm, classes,
     
     From:  http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
     """
-    if not title:
+    if title is None:
         if normalize:
             title = 'Normalized confusion matrix'
         else:
