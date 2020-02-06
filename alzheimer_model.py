@@ -49,7 +49,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size):
     test_size = len(adni_dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
 
     print('%d MRI images in training loader...' % (train_size))
@@ -97,9 +97,9 @@ def test(class_names, data_dir, results_dir, epochs, batch_size):
         print('[epoch %d] pérdida: %.3f' % (epoch + 1, running_loss / train_size))
         losses.append([epoch + 1, running_loss / train_size])
         if epoch % 10 == 9:
-            torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-densenet121.pth')
+            torch.save(model.state_dict(), results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-densenet121.pth')
         
-    torch.save(model.state_dict(), RESULTS_DIR+'/'+device.type+'-alzheimer-densenet121.pth')
+    torch.save(model.state_dict(), results_dir+'/'+device.type+'-alzheimer-densenet121.pth')
 
     model.eval()
     test = []
