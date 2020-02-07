@@ -19,12 +19,11 @@ def print_info_and_plots(test, predicted, class_names, losses=None):
 
     # Imprime estadísticas
     print(classification_report(test, predicted, labels=list(range(len(class_names))), target_names=class_names))
-    print('Accuracy: ', accuracy_score(test, predicted))
-    print('Accuracy (normalized): ', accuracy_score(test, predicted, normalize=True))
-    print('Specificity (precision) - micro', precision_score(test, predicted, average='micro'))
-    print('Specificity (precision) - macro', precision_score(test, predicted, average='macro'))
-    print('Sensitivity (recall) - micro', recall_score(test, predicted, average='micro'))
-    print('Sensitivity (recall) - macro', recall_score(test, predicted, average='macro'))
+    print('Accuracy: {:.2f}'.format(accuracy_score(test, predicted)))
+    print('Specificity (precision) - micro: {:.2f}'.format(precision_score(test, predicted, average='micro')))
+    print('Specificity (precision) - macro: {:.2f}'.format(precision_score(test, predicted, average='macro')))
+    print('Sensitivity (recall) - micro: {:.2f}'.format(recall_score(test, predicted, average='micro')))
+    print('Sensitivity (recall) - macro: {:.2f}'.format(recall_score(test, predicted, average='macro')))
 
     # loss plot
     if (losses is not None):
