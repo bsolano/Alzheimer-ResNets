@@ -19,6 +19,8 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from torchsummary import summary
 
+import pickle
+
 def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None):
     import platform; print(platform.platform())
     import sys; print('Python ', sys.version)
