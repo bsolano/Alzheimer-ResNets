@@ -64,7 +64,8 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     if model_file is not None:
         model.load_state_dict(torch.load(results_dir+'/'+model_file))
         match = re.match( r'.*-epoch-(\d+)-.*', model_file, re.M)
-        starting_epoch = int(match.group(1))
+        starting_epoch = int(match.group(1)) + 1
+        print('Loaded file {}, restarting at epoch {}.'.format(model_file, starting_epoch))
     model.train()
 
     # Imprime el modelo:
