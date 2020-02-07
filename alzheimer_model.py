@@ -19,7 +19,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from torchsummary import summary
 
-def test(class_names, data_dir, results_dir, epochs, batch_size):
+def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None):
     import platform; print(platform.platform())
     import sys; print('Python ', sys.version)
     import pydicom; print('pydicom ', pydicom.__version__)
@@ -74,7 +74,8 @@ def test(class_names, data_dir, results_dir, epochs, batch_size):
     # Ciclo de entrenamiento:
     losses = []
     for epoch in range(epochs):
-        lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[69])
+        if lr_decay_epochs is not None:
+            lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=lr_decay_epochs)
         running_loss = 0.0
         for i, data in enumerate(train_loader):
             # get the inputs; data is a list of [inputs, labels]
@@ -96,6 +97,9 @@ def test(class_names, data_dir, results_dir, epochs, batch_size):
             
         print('[epoch %d] pérdida: %.3f' % (epoch + 1, running_loss / train_size))
         losses.append([epoch + 1, running_loss / train_size])
+        with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-losses.dump', 'wb') as losses_file:
+            pickle.dump(losses, losses_file)
+            losses_file.close()
         if epoch % 10 == 9:
             torch.save(model.state_dict(), results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-densenet121.pth')
         
@@ -142,4 +146,5 @@ if __name__ == '__main__':
          data_dir='./NumpyADNI',
          results_dir='./results',
          epochs=110,
-         batch_size=5)
+         batch_size=5,
+         lr_decay_epochs=[69])
