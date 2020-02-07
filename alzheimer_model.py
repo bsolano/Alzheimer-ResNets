@@ -20,8 +20,9 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torchsummary import summary
 
 import pickle
+import re
 
-def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None):
+def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None, model_file=None):
     import platform; print(platform.platform())
     import sys; print('Python ', sys.version)
     import pydicom; print('pydicom ', pydicom.__version__)
@@ -58,8 +59,12 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     print('%d MRI images in testing loader...' % (test_size))
 
     # Inicializa y carga el modelo
-    model = densenet121(channels=1, num_classes=len(class_names), drop_rate=0.7).cuda()
+    model = densenet121(channels=1, num_classes=len(class_names), drop_rate=0.7).to(device)
     model = torch.nn.DataParallel(model).to(device)
+    if model_file is not None:
+        model.load_state_dict(torch.load(results_dir+'/'+model_file))
+        match = re.match( r'.*-epoch-(\d+)-.*', model_file, re.M)
+        starting_epoch = int(match.group(1))
     model.train()
 
     # Imprime el modelo:
@@ -75,7 +80,13 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Ciclo de entrenamiento:
     losses = []
-    for epoch in range(epochs):
+    try: starting_epoch
+    except NameError: starting_epoch = None
+    if starting_epoch is None:
+        epoch = 0
+    else:
+        epoch = starting_epoch
+    while epoch < epochs:
         if lr_decay_epochs is not None:
             lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=lr_decay_epochs)
         running_loss = 0.0
@@ -105,6 +116,9 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         if epoch % 10 == 9:
             torch.save(model.state_dict(), results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-densenet121.pth')
         
+        # Next epoch
+        epoch += 1
+
     torch.save(model.state_dict(), results_dir+'/'+device.type+'-alzheimer-densenet121.pth')
 
     model.eval()
@@ -135,6 +149,7 @@ def lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[]):
     if epoch not in lr_decay_epochs:
         return optimizer
     
+    print('Learning rate decay of {} on epoch {}.'.format(lr_decay, epoch))
     for param_group in optimizer.param_groups:
         param_group['lr'] *= lr_decay
 
