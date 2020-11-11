@@ -184,7 +184,7 @@ def main():
         filename = SAVE_DIR+'/'+labels[key]+'/'+key+'.np'
         with open(filename, 'wb') as file:
             print('Saving {}...'.format(filename))
-            np.save(file, np.array([np.array([image]), np.array(label)]))
+            np.save(file, np.array([np.array([image]), np.array(label)], dtype=object))
             files += 1
             file.close()
             
