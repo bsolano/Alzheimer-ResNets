@@ -22,7 +22,7 @@ from torchsummary import summary
 import pickle
 import re
 
-def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None, model_file=None):
+def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None, model_file=None, architecture='densenet121'):
     import platform; print(platform.platform())
     import sys; print('Python ', sys.version)
     import pydicom; print('pydicom ', pydicom.__version__)
@@ -59,7 +59,8 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     print('%d MRI images in testing loader...' % (test_size))
 
     # Inicializa y carga el modelo
-    model = densenet121(channels=1, num_classes=len(class_names), drop_rate=0.7).to(device)
+    class_ = globals()[architecture]
+    model = class_(channels=1, num_classes=len(class_names), drop_rate=0.7).to(device)
     model = torch.nn.DataParallel(model).to(device)
     if model_file is not None:
         model.load_state_dict(torch.load(results_dir+'/'+model_file))
@@ -114,8 +115,8 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-losses.dump', 'wb') as losses_file:
             pickle.dump(losses, losses_file)
             losses_file.close()
-        if epoch % 10 == 9:
-            torch.save(model.state_dict(), results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-densenet121.pth')
+        if (epoch % 10 == 9) or (epoch >= 79):
+            torch.save(model.state_dict(), results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-' + architecture + '.pth')
         
         # Next epoch
         epoch += 1
