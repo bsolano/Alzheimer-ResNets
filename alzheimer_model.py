@@ -79,7 +79,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Optimizador:
     # Estas son optimizaciones al algoritmo de descenso por gradiente para evitar mínimos locales en la búsqueda.
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9) # SGD: Descenso por gradiente estocástico
+    optimizer = torch.optim.Rprop(model.parameters()) # Resilient backpropagation algorithm
 
     # Ciclo de entrenamiento:
     losses = []
