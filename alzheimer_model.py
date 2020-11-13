@@ -26,6 +26,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     import platform; print(platform.platform())
     import sys; print('Python ', sys.version)
     import pydicom; print('pydicom ', pydicom.__version__)
+    print('pytorch ', torch.__version__)
     
     # Sets device to GPU if available, else CPU
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
