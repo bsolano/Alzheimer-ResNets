@@ -111,7 +111,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
             # print statistics
             running_loss += loss.item()
             
-        print('[epoch %d] pérdida: %.3f' % (epoch + 1, running_loss / train_size))
+        print('[epoch %d] pérdida: %.3f' % (epoch, running_loss / train_size))
         losses.append([epoch + 1, running_loss / train_size])
         with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-losses.dump', 'wb') as losses_file:
             pickle.dump(losses, losses_file)
