@@ -151,4 +151,4 @@ def load_numpy_adni(path):
 class NumpyADNI_FolderDataset(torchvision.datasets.DatasetFolder):
     def __init__(self, data_dir='./NumpyADNI', class_names=['CN','EMCI','MCI','LMCI','AD']):
         ''' '''
-        super(NumpyADNI_FolderDataset, self).__init__(root=data_dir, loader=load_numpy_adni)
+        super(NumpyADNI_FolderDataset, self).__init__(root=data_dir, loader=load_numpy_adni, extensions=('.np'))
