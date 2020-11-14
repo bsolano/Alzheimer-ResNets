@@ -16,7 +16,7 @@ import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torchvision.transforms as transforms
-from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data.sampler import WeightedRandomSampler
 
 from torchsummary import summary
 
