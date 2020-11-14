@@ -46,14 +46,26 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     #transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='sagittal', cut=(slice(40,214,2),slice(50,200,2),slice(40,240,2)), normalize=True)]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
 
     # Conjunto de datos con las transformaciones especificadas anteriormente
-    adni_dataset = NumpyADNI_Dataset(data_dir=data_dir)
+    adni_dataset = NumpyADNI_FolderDataset(data_dir=data_dir)
+
+    # Sampler
+    target_list = torch.tensor(adni_dataset.targets)
+    target_list = target_list[torch.randperm(len(target_list))]
+    class_count = [i for i in get_class_distribution(adni_dataset).values()]
+    class_weights = 1./torch.tensor(class_count, dtype=torch.float)
+    class_weights_all = class_weights[target_list]
+    weighted_sampler = WeightedRandomSampler(
+        weights=class_weights_all,
+        num_samples=len(class_weights_all),
+        replacement=True
+    )
 
     # Entrenamiento y prueba
     train_size = int(0.75 * len(adni_dataset))
     test_size = len(adni_dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False, sampler=weighted_sampler, num_workers=4)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
 
     print('%d MRI images in training loader...' % (train_size))
