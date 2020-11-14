@@ -1,9 +1,9 @@
 import torch
+import torchvision
 import pydicom as dcm
 import itertools
 import re
 import csv
-import torch
 import numpy as np
 from pathlib import Path
 
@@ -138,3 +138,17 @@ class NumpyADNI_Dataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.image_names)
+
+
+def load_numpy_adni(path):
+    with open(path, mode='rb') as data:
+        [image, label] = np.load(data, allow_pickle=True)
+        data.close()
+
+    return [torch.from_numpy(image), torch.from_numpy(label)]
+
+
+class NumpyADNI_FolderDataset(torchvision.datasets.DatasetFolder):
+    def __init__(self, data_dir='./NumpyADNI', class_names=['CN','EMCI','MCI','LMCI','AD']):
+        ''' '''
+        super(NumpyADNI_FolderDataset, self).__init__(root=data_dir, loader=load_numpy_adni)
