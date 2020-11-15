@@ -56,7 +56,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Sampler
     targets = torch.tensor(adni_dataset.targets)
-    target_list = torch.tensor(targets[train_dataset.indices])
+    target_list = targets[train_dataset.indices]
     class_count = [i for i in get_class_distribution(adni_dataset).values()]
     class_weights = 1./torch.tensor(class_count, dtype=torch.float)
     class_weights_all = class_weights[target_list]
