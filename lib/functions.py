@@ -162,17 +162,9 @@ def plot_confusion_matrix(cm, classes,
 
 
 def get_class_distribution(dataset_obj):
-    '''
-    
-    https://towardsdatascience.com/pytorch-basics-sampling-samplers-2a0f29f0bf2a
-
-    '''
     count_dict = {k:0 for k,v in dataset_obj.class_to_idx.items()}
-    idx2class = {v: k for k, v in dataset_obj.class_to_idx.items()}
     
-    for element in dataset_obj:
-        y_lbl = element[1]
-        y_lbl = idx2class[y_lbl]
-        count_dict[y_lbl] += 1
+    for target in dataset_obj.targets:
+        count_dict[dataset_obj.classes[target]] += 1
             
     return count_dict

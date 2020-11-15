@@ -51,14 +51,13 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Sampler
     target_list = torch.tensor(adni_dataset.targets)
-    target_list = target_list[torch.randperm(len(target_list))]
     class_count = [i for i in get_class_distribution(adni_dataset).values()]
     class_weights = 1./torch.tensor(class_count, dtype=torch.float)
     class_weights_all = class_weights[target_list]
     weighted_sampler = WeightedRandomSampler(
         weights=class_weights_all,
         num_samples=len(class_weights_all),
-        replacement=True
+        replacement=False
     )
 
     # Entrenamiento y prueba

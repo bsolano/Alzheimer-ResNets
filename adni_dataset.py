@@ -6,6 +6,7 @@ import re
 import csv
 import numpy as np
 from pathlib import Path
+from typing import Any, Callable, cast, Dict, List, Optional, Tuple
 
 class ADNI_Dataset(torch.utils.data.Dataset):
     def __init__(self, data_dir='ADNI', class_names=['CN','SMC','EMCI','MCI','LMCI','AD'], transform=None):
@@ -145,10 +146,21 @@ def load_numpy_adni(path):
         [image, label] = np.load(data, allow_pickle=True)
         data.close()
 
-    return [torch.from_numpy(image), torch.from_numpy(label)]
+    return torch.from_numpy(image), torch.from_numpy(np.array(label))
 
 
 class NumpyADNI_FolderDataset(torchvision.datasets.DatasetFolder):
     def __init__(self, data_dir='./NumpyADNI', class_names=['CN','EMCI','MCI','LMCI','AD']):
         ''' '''
         super(NumpyADNI_FolderDataset, self).__init__(root=data_dir, loader=load_numpy_adni, extensions=('.np'))
+
+    def __getitem__(self, index: int) -> Tuple[Any, Any]:
+        """
+        Args:
+            index (int): Index
+
+        Returns:
+            tuple: (sample, class) where class is a vector of zeros and ones, with a one in the class.
+        """
+        path, target = self.samples[index]
+        return self.loader(path)
