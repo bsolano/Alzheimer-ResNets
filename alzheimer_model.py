@@ -49,8 +49,14 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     # Conjunto de datos con las transformaciones especificadas anteriormente
     adni_dataset = NumpyADNI_FolderDataset(data_dir=data_dir)
 
+    # Entrenamiento y prueba
+    train_size = int(0.75 * len(adni_dataset))
+    test_size = len(adni_dataset) - train_size
+    train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
+
     # Sampler
-    target_list = torch.tensor(adni_dataset.targets)
+    targets = torch.tensor(adni_dataset.targets)
+    target_list = torch.tensor(targets[train_dataset.indices])
     class_count = [i for i in get_class_distribution(adni_dataset).values()]
     class_weights = 1./torch.tensor(class_count, dtype=torch.float)
     class_weights_all = class_weights[target_list]
@@ -60,11 +66,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         replacement=False
     )
 
-    # Entrenamiento y prueba
-    train_size = int(0.75 * len(adni_dataset))
-    test_size = len(adni_dataset) - train_size
-    train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
-
+    # Loaders
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False, sampler=weighted_sampler, num_workers=5)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
 
