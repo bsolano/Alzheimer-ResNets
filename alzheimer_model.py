@@ -23,7 +23,9 @@ from torchsummary import summary
 import pickle
 import re
 
-def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None, model_file=None, architecture='densenet121'):
+from sklearn.metrics import accuracy_score
+
+def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None, model_file=None, architecture='densenet121', plot_accuracy=None):
     import platform; print(platform.platform())
     import sys; print('Python ', sys.version)
     import pydicom; print('pydicom ', pydicom.__version__)
@@ -98,6 +100,10 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Ciclo de entrenamiento:
     losses = []
+    if plot_accuracy:
+        accuracies = []
+    else:
+        accuracies = None
     try: starting_epoch
     except NameError: starting_epoch = None
     if starting_epoch is None:
@@ -131,6 +137,17 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-losses.dump', 'wb') as losses_file:
             pickle.dump(losses, losses_file)
             losses_file.close()
+        if plot_accuracy:
+            model.eval()
+            test, predicted = get_test_predicted(device, model, test_loader)
+            model.train()
+            accuracy = accuracy_score(test, predicted))
+            print('[epoch %d] exactitud: %.3f' % (epoch, accuracy))
+            accuracies.append(accuracy)
+            with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-accuracies.dump', 'wb') as accuracies_file:
+                pickle.dump(accuracies, accuracies_file)
+                accuracies_file.close()
+
         if (epoch % 10 == 9) or (epoch >= 79):
             torch.save(model.state_dict(), results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-alzheimer-' + architecture + '.pth')
         
@@ -140,26 +157,10 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     torch.save(model.state_dict(), results_dir+'/'+device.type+'-alzheimer-' + architecture + '.pth')
 
     model.eval()
-    test = []
-    predicted = []
-    with torch.no_grad():
-        for data in test_loader:
-            # get the inputs; data is a list of [inputs, labels]
-            inputs, labels = data
-            labels = labels.to(device)
-            _, label = torch.max(labels, 1)
-            test.append(label)
-
-            outputs = model(inputs)
-
-            _, predicted_value = torch.max(outputs.data, 1)
-            predicted.append(predicted_value)
-
-    test = [x.item() for x in test]
-    predicted = [x.item() for x in predicted]
+    test, predicted = get_test_predicted(device, model, test_loader)
 
     # Imprime estadísticas y gráficos
-    print_info_and_plots(test, predicted, class_names, losses)
+    print_info_and_plots(test, predicted, class_names, losses, accuracies)
 
 
 def lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=[]):

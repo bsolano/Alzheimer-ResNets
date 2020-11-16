@@ -13,7 +13,29 @@ import numpy as np
 
 import torch
 
-def print_info_and_plots(test, predicted, class_names, losses=None):
+def get_test_predicted(device, model, loader):
+    test = []
+    predicted = []
+    with torch.no_grad():
+        for data in test_loader:
+            # get the inputs; data is a list of [inputs, labels]
+            inputs, labels = data
+            labels = labels.to(device)
+            _, label = torch.max(labels, 1)
+            test.append(label)
+
+            outputs = model(inputs)
+
+            _, predicted_value = torch.max(outputs.data, 1)
+            predicted.append(predicted_value)
+
+    test = [x.item() for x in test]
+    predicted = [x.item() for x in predicted]
+
+    return test, predicted
+
+
+def print_info_and_plots(test, predicted, class_names, losses=None, accuracies=None):
     cnf_matrix = confusion_matrix(test, predicted)
     plot_confusion_matrix(cnf_matrix, title='', classes=class_names)
 
@@ -29,6 +51,10 @@ def print_info_and_plots(test, predicted, class_names, losses=None):
     if (losses is not None):
         plot_loss(losses)
 
+    # loss plot
+    if (accuracies is not None):
+        plot_accuracy(accuracies)
+
     # ROC curve
     plot_ROC_curve(test, predicted, classes=class_names)
 
@@ -40,6 +66,17 @@ def plot_loss(losses):
     plt.plot(x, y, 'r')
     plt.xlabel('epoch')
     plt.ylabel('loss')
+    plt.show()
+    plt.close()
+
+
+def plot_accuracy(accuracies):
+    x = [accuracies[i][0] for i in range(len(accuracies))]
+    y = [accuracies[i][1] for i in range(len(accuracies))]
+
+    plt.plot(x, y, 'r')
+    plt.xlabel('epoch')
+    plt.ylabel('accuracy')
     plt.show()
     plt.close()
 
