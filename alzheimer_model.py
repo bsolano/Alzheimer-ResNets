@@ -93,7 +93,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Optimizador:
     # Estas son optimizaciones al algoritmo de descenso por gradiente para evitar mínimos locales en la búsqueda.
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9) # SGD: Descenso por gradiente estocástico
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, nesterov=True) # SGD: Descenso por gradiente estocástico
 
 
     # Ciclo de entrenamiento:
@@ -137,7 +137,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         # Next epoch
         epoch += 1
 
-    torch.save(model.state_dict(), results_dir+'/'+device.type+'-alzheimer-densenet121.pth')
+    torch.save(model.state_dict(), results_dir+'/'+device.type+'-alzheimer-' + architecture + '.pth')
 
     model.eval()
     test = []
