@@ -141,7 +141,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
             model.eval()
             test, predicted = get_test_predicted(device, model, test_loader)
             model.train()
-            accuracy = accuracy_score(test, predicted))
+            accuracy = accuracy_score(test, predicted)
             print('[epoch %d] exactitud: %.3f' % (epoch, accuracy))
             accuracies.append(accuracy)
             with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-accuracies.dump', 'wb') as accuracies_file:
