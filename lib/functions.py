@@ -17,7 +17,7 @@ def get_test_predicted(device, model, loader):
     test = []
     predicted = []
     with torch.no_grad():
-        for data in test_loader:
+        for data in loader:
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
             labels = labels.to(device)
