@@ -134,7 +134,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
             # print statistics
             running_loss += loss.item()
             
-        print('[epoch %d] pérdida: %.3f' % (epoch, running_loss / train_size))
+        print('[epoch %d] pérdida: %.6f' % (epoch, running_loss / train_size))
         losses.append([epoch + 1, running_loss / train_size])
         with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-losses.dump', 'wb') as losses_file:
             pickle.dump(losses, losses_file)
@@ -144,7 +144,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
             test, predicted = get_test_predicted(device, model, test_loader)
             model.train()
             accuracy = accuracy_score(test, predicted)
-            print('[epoch %d] exactitud: %.3f' % (epoch, accuracy))
+            print('[epoch %d] exactitud: %.6f' % (epoch, accuracy))
             accuracies.append(accuracy)
             with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-accuracies.dump', 'wb') as accuracies_file:
                 pickle.dump(accuracies, accuracies_file)
