@@ -8,7 +8,9 @@ from transforms import ToTensor
 from adni_dataset import ADNI_Dataset
 from adni_dataset import NumpyADNI_Dataset
 from adni_dataset import NumpyADNI_FolderDataset
-from lib.functions import *
+from lib.functions import get_class_distribution
+from lib.functions import get_test_predicted
+from lib.functions import print_info_and_plots
 
 from models.densenet import densenet121
 
@@ -32,7 +34,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     print('pytorch ', torch.__version__)
     
     # Sets device to GPU if available, else CPU
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # pylint: disable=no-member
     print('Using device:', device)
 
     # Additional about GPU
@@ -57,10 +59,10 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
     # Sampler
-    targets = torch.tensor(adni_dataset.targets)
+    targets = torch.tensor(adni_dataset.targets) # pylint: disable=not-callable
     target_list = targets[train_dataset.indices]
     class_count = [i for i in get_class_distribution(adni_dataset).values()]
-    class_weights = 1./torch.tensor(class_count, dtype=torch.float)
+    class_weights = 1./torch.tensor(class_count, dtype=torch.float) # pylint: disable=no-member,not-callable
     class_weights_all = class_weights[target_list]
     weighted_sampler = WeightedRandomSampler(
         weights=class_weights_all,
@@ -114,7 +116,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         if lr_decay_epochs is not None:
             lr_scheduler(optimizer, epoch, lr_decay=0.1, lr_decay_epochs=lr_decay_epochs)
         running_loss = 0.0
-        for i, data in enumerate(train_loader):
+        for _, data in enumerate(train_loader):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
             labels = labels.to(device)
@@ -125,7 +127,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
             # forward + backward + optimize
             outputs = model(inputs)
-            loss = criterion(outputs, torch.max(labels, 1)[1])
+            loss = criterion(outputs, torch.max(labels, 1)[1]) # pylint: disable=no-member
             loss.backward()
             optimizer.step()
 

@@ -21,12 +21,12 @@ def get_test_predicted(device, model, loader):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
             labels = labels.to(device)
-            _, label = torch.max(labels, 1)
+            _, label = torch.max(labels, 1) # pylint: disable=no-member
             test.append(label)
 
             outputs = model(inputs)
 
-            _, predicted_value = torch.max(outputs.data, 1)
+            _, predicted_value = torch.max(outputs.data, 1) # pylint: disable=no-member
             predicted.append(predicted_value)
 
     test = [x.item() for x in test]
@@ -88,7 +88,7 @@ def plot_ROC_curve(true, predicted, classes):
     
     # Data
     true = label_binarize(true, classes=list(range(len(classes))))    
-    predicted = torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=list(range(len(classes)))))).numpy()
+    predicted = torch.sigmoid(torch.Tensor(label_binarize(predicted, classes=list(range(len(classes)))))).numpy() # pylint: disable=no-member
     n_classes = true.shape[1]
 
     # Line width
@@ -150,7 +150,7 @@ def plot_ROC_curve(true, predicted, classes):
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title=None,
-                          cmap=plt.cm.Blues):
+                          cmap=plt.cm.Blues): # pylint: disable=no-member
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
