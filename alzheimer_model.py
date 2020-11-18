@@ -27,7 +27,7 @@ import re
 
 from sklearn.metrics import accuracy_score
 
-def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None, model_file=None, architecture='densenet121', plot_accuracy=None):
+def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs=None, model_file=None, architecture='densenet121', plot_accuracy=None, nesterov=False):
     import platform; print(platform.platform())
     import sys; print('Python ', sys.version)
     import pydicom; print('pydicom ', pydicom.__version__)
@@ -97,7 +97,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Optimizador:
     # Estas son optimizaciones al algoritmo de descenso por gradiente para evitar mínimos locales en la búsqueda.
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, nesterov=True) # SGD: Descenso por gradiente estocástico
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, nesterov=nesterov) # SGD: Descenso por gradiente estocástico
 
 
     # Ciclo de entrenamiento:
@@ -135,7 +135,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
             running_loss += loss.item()
             
         print('[epoch %d] pérdida: %.6f' % (epoch, running_loss / train_size))
-        losses.append([epoch + 1, running_loss / train_size])
+        losses.append([epoch, running_loss / train_size])
         with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-losses.dump', 'wb') as losses_file:
             pickle.dump(losses, losses_file)
             losses_file.close()
@@ -145,7 +145,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
             model.train()
             accuracy = accuracy_score(test, predicted)
             print('[epoch %d] exactitud: %.6f' % (epoch, accuracy))
-            accuracies.append(accuracy)
+            accuracies.append([epoch, accuracy])
             with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-accuracies.dump', 'wb') as accuracies_file:
                 pickle.dump(accuracies, accuracies_file)
                 accuracies_file.close()
