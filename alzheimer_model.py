@@ -73,6 +73,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
 
     # Loaders
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False, sampler=None, num_workers=5)
+    test_train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, num_workers=4)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
 
     print('%d MRI images in training loader...' % (train_size))
@@ -142,7 +143,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         if plot_accuracy:
             model.eval()
             test_test, predicted_test = get_test_predicted(device, model, test_loader)
-            test_train, predicted_train = get_test_predicted(device, model, train_loader)
+            test_train, predicted_train = get_test_predicted(device, model, test_train_loader)
             model.train()
             accuracy_test = accuracy_score(test_test, predicted_test)
             accuracy_train = accuracy_score(test_train, predicted_train)
