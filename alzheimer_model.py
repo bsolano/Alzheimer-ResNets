@@ -60,7 +60,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
     # Sampler
-    targets = torch.tensor(adni_dataset.targets) # pylint: disable=not-callable,disable=no-member
+    '''targets = torch.tensor(adni_dataset.targets) # pylint: disable=not-callable,disable=no-member
     target_list = targets[train_dataset.indices]
     class_count = [i for i in get_class_distribution(adni_dataset).values()]
     class_weights = 1./torch.tensor(class_count, dtype=torch.float) # pylint: disable=no-member,not-callable
@@ -69,7 +69,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
         weights=class_weights_all,
         num_samples=len(class_weights_all),
         replacement=False
-    )
+    )'''
 
     # Loaders
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False, sampler=None, num_workers=5)
