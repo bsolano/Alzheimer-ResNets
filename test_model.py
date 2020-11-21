@@ -5,7 +5,8 @@ The main implementation.
 """
 import sys
 
-from lib.functions import *
+from lib.functions import get_test_predicted
+from lib.functions import print_info_and_plots
 from models.densenet import densenet121
 from adni_dataset import NumpyADNI_Dataset
 
@@ -20,7 +21,7 @@ def test(file, class_names, data_dir, results_dir):
     import pydicom; print('pydicom ', pydicom.__version__)
     
     # Sets device to GPU if available, else CPU
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # pylint: disable=no-member
     print('Using device:', device)
 
     # Additional about GPU
@@ -57,12 +58,12 @@ def test(file, class_names, data_dir, results_dir):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
             labels = labels.to(device)
-            _, label = torch.max(labels, 1)
+            _, label = torch.max(labels, 1) # pylint: disable=no-member
             test.append(label)
 
             outputs = model(inputs)
 
-            _, predicted_value = torch.max(outputs.data, 1)
+            _, predicted_value = torch.max(outputs.data, 1) # pylint: disable=no-member
             predicted.append(predicted_value)
 
     test = [x.item() for x in test]

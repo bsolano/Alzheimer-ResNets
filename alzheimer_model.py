@@ -13,6 +13,7 @@ from lib.functions import get_test_predicted
 from lib.functions import print_info_and_plots
 
 from models.densenet import densenet121
+from models.densenet import densenet169
 
 import torch
 import torch.nn as nn
@@ -51,7 +52,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     #transform = transforms.Compose([ToTensor(spacing=[1,1,1], num_slices=256, aspect='sagittal', cut=(slice(40,214,2),slice(50,200,2),slice(40,240,2)), normalize=True)]) # Hace falta normalizar pero la función de pytorch no funciona en cubos
 
     # Conjunto de datos con las transformaciones especificadas anteriormente
-    adni_dataset = NumpyADNI_FolderDataset(data_dir=data_dir)
+    adni_dataset = NumpyADNI_Dataset(data_dir=data_dir)
 
     # Entrenamiento y prueba
     train_size = int(0.75 * len(adni_dataset))
@@ -59,7 +60,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     train_dataset, test_dataset = torch.utils.data.random_split(adni_dataset, [train_size, test_size])
 
     # Sampler
-    targets = torch.tensor(adni_dataset.targets) # pylint: disable=not-callable
+    targets = torch.tensor(adni_dataset.targets) # pylint: disable=not-callable,disable=no-member
     target_list = targets[train_dataset.indices]
     class_count = [i for i in get_class_distribution(adni_dataset).values()]
     class_weights = 1./torch.tensor(class_count, dtype=torch.float) # pylint: disable=no-member,not-callable
@@ -71,7 +72,7 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     )
 
     # Loaders
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False, sampler=weighted_sampler, num_workers=5)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False, sampler=None, num_workers=5)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=4)
 
     print('%d MRI images in training loader...' % (train_size))
@@ -98,7 +99,6 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
     # Optimizador:
     # Estas son optimizaciones al algoritmo de descenso por gradiente para evitar mínimos locales en la búsqueda.
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, nesterov=nesterov) # SGD: Descenso por gradiente estocástico
-
 
     # Ciclo de entrenamiento:
     losses = []
@@ -141,11 +141,13 @@ def test(class_names, data_dir, results_dir, epochs, batch_size, lr_decay_epochs
             losses_file.close()
         if plot_accuracy:
             model.eval()
-            test, predicted = get_test_predicted(device, model, test_loader)
+            test_test, predicted_test = get_test_predicted(device, model, test_loader)
+            test_train, predicted_train = get_test_predicted(device, model, train_loader)
             model.train()
-            accuracy = accuracy_score(test, predicted)
-            print('[epoch %d] exactitud: %.6f' % (epoch, accuracy))
-            accuracies.append([epoch, accuracy])
+            accuracy_test = accuracy_score(test_test, predicted_test)
+            accuracy_train = accuracy_score(test_train, predicted_train)
+            print('[epoch %d] exactitud: %.6f (prueba) %.6f (entrenamiento)' % (epoch, accuracy_test, accuracy_train))
+            accuracies.append([epoch, accuracy_test, accuracy_train])
             with open(results_dir+'/'+device.type+'-epoch-'+str(epoch)+'-accuracies.dump', 'wb') as accuracies_file:
                 pickle.dump(accuracies, accuracies_file)
                 accuracies_file.close()

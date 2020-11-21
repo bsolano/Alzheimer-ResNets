@@ -74,9 +74,17 @@ def plot_accuracy(accuracies):
     x = [accuracies[i][0] for i in range(len(accuracies))]
     y = [accuracies[i][1] for i in range(len(accuracies))]
 
-    plt.plot(x, y, 'r')
+    plt.plot(x, y, 'g', label='test accuracy')
+
+    x = [accuracies[i][0] for i in range(len(accuracies))]
+    y = [accuracies[i][2] for i in range(len(accuracies))]
+
+    plt.plot(x, y, 'b', label='train accuracy')
+
     plt.xlabel('epoch')
     plt.ylabel('accuracy')
+    plt.title('train/test accuracies during training')
+    plt.legend()
     plt.show()
     plt.close()
 
